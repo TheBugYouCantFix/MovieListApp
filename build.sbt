@@ -19,5 +19,9 @@ lazy val root = (project in file("."))
       "io.circe" %% "circe-parser" % circeVersion,
 
       "dev.zio" %% "zio" % zioVersion,
+
+      "io.getquill"          %% "quill-jdbc-zio" % "4.8.5",
+      "org.postgresql"       %  "postgresql"     % "42.3.1",
+      "com.zaxxer"    % "HikariCP"    % "5.0.1"   // connection pool
     )
   )
