@@ -1,4 +1,4 @@
-package backend.movie
+package domain
 
 import io.circe.*
 import io.circe.generic.semiauto.*

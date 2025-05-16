@@ -4,9 +4,7 @@ import io.getquill.*
 import io.getquill.jdbczio.Quill
 
 import zio.{Task, ZIO, ZLayer}
-
-import backend.movie.Movie
-import backend.auth.User
+import domain.{Movie, User}
 
 class DbService(quill: Quill.Postgres[SnakeCase]) {
   import quill.*

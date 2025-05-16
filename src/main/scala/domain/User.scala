@@ -1,4 +1,4 @@
-package backend.auth
+package domain
 
 case class User(
                id: Long,
