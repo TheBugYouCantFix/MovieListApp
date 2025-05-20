@@ -1,15 +1,18 @@
 package domain
 
+import com.augustnagro.magnum.*
+
 import io.circe.*
 import io.circe.generic.semiauto.*
 
 case class MovieSlug(value: String) extends AnyVal
 
+@Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 case class Movie(
-                userId: Long, // ID of a user which the movie is associated with
+                @Id uid: Long, // ID of a user which the movie is associated with
                 name: String,
                 rating: Int,
                 review: String
-                ) derives Codec.AsObject
+                ) derives DbCodec, Codec.AsObject
 
 
