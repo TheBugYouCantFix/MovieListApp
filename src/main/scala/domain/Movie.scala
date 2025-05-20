@@ -9,7 +9,7 @@ case class MovieSlug(value: String) extends AnyVal
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 case class Movie(
-                @Id movieId: Long,
+                @Id movieId: ID,
                 uid: Long, // ID of a user which the movie is associated with
                 name: String,
                 rating: Int,
