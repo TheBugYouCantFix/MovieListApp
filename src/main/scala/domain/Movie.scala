@@ -9,10 +9,11 @@ case class MovieSlug(value: String) extends AnyVal
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 case class Movie(
-                @Id uid: Long, // ID of a user which the movie is associated with
+                @Id movieId: Long,
+                uid: Long, // ID of a user which the movie is associated with
                 name: String,
                 rating: Int,
                 review: String
                 ) derives DbCodec, Codec.AsObject
 
-
+val movieRepo = Repo[Movie, Movie, Long]

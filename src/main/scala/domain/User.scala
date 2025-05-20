@@ -7,9 +7,11 @@ import io.circe.generic.semiauto.*
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 case class User(
-               uid: Long,
+               @Id uid: Long,
                username: String,
                passwordHash: String
-               ) derives DbCodec, Codec.AsObject 
+               ) derives DbCodec, Codec.AsObject
+
+val userRepo = Repo[User, User, Long]
 
 
