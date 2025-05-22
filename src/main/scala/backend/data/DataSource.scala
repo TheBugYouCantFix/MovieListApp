@@ -8,7 +8,8 @@ import javax.sql.DataSource
 val dataSource: DataSource = {
   val hikari = new HikariDataSource()
   hikari.setJdbcUrl("jdbc:postgresql://localhost:5432/mydb")
-  hikari.setUsername("user")
+  hikari.setUsername("app_user")
   hikari.setPassword("password")
+  hikari.setDriverClassName("org.postgresql.Driver")
   hikari
 }
