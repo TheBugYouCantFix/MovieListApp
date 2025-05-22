@@ -28,9 +28,9 @@ lazy val root = (project in file("."))
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
 
 
-      "com.augustnagro" %% "magnum" % "1.3.0",
-          "com.augustnagro" %% "magnumzio" % "1",
+      "com.augustnagro" %% "magnumzio" % "2.0.0-M1",
       "com.zaxxer"    % "HikariCP"    % "5.0.1", // connection pool
+      "org.postgresql" % "postgresql" % "42.7.3",
 
       "eu.timepit" %% "refined" % "0.11.3"
     )
