@@ -1,52 +1,50 @@
 package backend.movie
 
-import sttp.tapir.*
+import zio.*
+
+import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 
-import backend.data.dataSource
 import com.augustnagro.magnum.connect
+import com.augustnagro.magnum.magzio.*
 
-import domain.{Movie, movieRepo, Error}
+import backend.data.dataSource
+import backend.data.repositories.MovieRepo
+import domain.{Error, Movie, ID}
 
 
 object MovieEndpoints:
   val add = endpoint
     .post
     .in(jsonBody[Movie])
-    .handleSuccess(
-      connect(dataSource) {
-        movieRepo.insert(_)
-      }
-    )
+    .errorOut(jsonBody[Error])
+    .zServerLogic(MovieHandlers.addMovieHandler)
 
   val getById = endpoint
     .get
-    .in(path[Long])
+    .in("movie" / path[Long])
     .out(jsonBody[Movie])
     .errorOut(jsonBody[Error])
-    .handle {
-        connect(dataSource) {
-          movieRepo.findById(_) match
-            case None => Left(Error("No movie matches the given id"))
-            case Some(m) => Right(m)
-        }
-    }
+    .zServerLogic(MovieHandlers.getMovieByIdHandler)
 
-  val udpate = endpoint
+  val update = endpoint
     .put
+    .in(path[ID])
     .in(jsonBody[Movie])
-    .handleSuccess(
-        connect(dataSource) {
-          movieRepo.update(_)
-        }
-    )
+    .errorOut(jsonBody[Error])
+    .zServerLogic(MovieHandlers.updateMovieHandler)
 
   val delete = endpoint
     .delete
-    .in(path[Long])
-    .handleSuccess {
-        connect(dataSource) {
-          movieRepo.deleteById(_)
-        }
-    }
+    .in("deleteMovie" / path[Long])
+    .errorOut(jsonBody[Error])
+    .zServerLogic(MovieHandlers.removeMovieByIdHandler)
+  
+  val getAll = endpoint
+    .get
+    .out(jsonBody[Vector[Movie]])
+    .errorOut(jsonBody[Error])
+    .zServerLogic(_ => MovieHandlers.getAllMoviesHandler)
+
+  val endpoints = List(add, getById, update, delete)

@@ -12,7 +12,7 @@ import tables.*
 trait MovieRepo:
   def add(movie: Movie): Task[Unit]
   def getById(id: ID): Task[Option[Movie]]
-  val getAll: Task[Vector[Movie]]
+  def getAll: Task[Vector[Movie]]
   def updateMovie(id: ID, movie: Movie): Task[Unit]
   def removeById(id: ID): Task[Unit] // name deleteById would shadow the db codec method name
 
@@ -27,7 +27,7 @@ final case class MovieRepoLive(xa: Transactor) extends Repo[Movie, tables.Movie,
       findById(id).map(_.toDomain)
     }
 
-  override val getAll: Task[Vector[Movie]] =
+  override def getAll: Task[Vector[Movie]] =
     xa.transact {
       findAll.map(_.toDomain)
     }
