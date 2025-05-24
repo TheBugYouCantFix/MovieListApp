@@ -40,11 +40,11 @@ object MovieEndpoints:
     .in("deleteMovie" / path[Long])
     .errorOut(jsonBody[Error])
     .zServerLogic(MovieHandlers.removeMovieByIdHandler)
-  
+
   val getAll = endpoint
     .get
     .out(jsonBody[Vector[Movie]])
     .errorOut(jsonBody[Error])
     .zServerLogic(_ => MovieHandlers.getAllMoviesHandler)
 
-  val endpoints = List(add, getById, update, delete)
+  val endpoints = List(add, getById, update, delete, getAll)
