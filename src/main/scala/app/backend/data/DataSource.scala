@@ -1,4 +1,4 @@
-package backend.data
+package app.backend.data
 
 import com.augustnagro.magnum.magzio.*
 import com.zaxxer.hikari.HikariDataSource

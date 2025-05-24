@@ -1,8 +1,7 @@
-package tables
+package app.tables
 
+import app.domain
 import com.augustnagro.magnum.*
-
-import domain.*
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 case class User(

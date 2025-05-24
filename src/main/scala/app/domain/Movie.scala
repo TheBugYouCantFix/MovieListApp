@@ -1,4 +1,4 @@
-package domain
+package app.domain
 
 import io.circe.*
 import io.circe.generic.semiauto.*

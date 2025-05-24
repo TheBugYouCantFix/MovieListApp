@@ -1,18 +1,11 @@
-package backend.movie
+package app.backend.movie
 
-import zio.*
+import app.backend.data.repositories.MovieRepo
+import app.domain.{Error, ID, Movie}
 
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
-
-import com.augustnagro.magnum.connect
-import com.augustnagro.magnum.magzio.*
-
-import backend.data.dataSource
-import backend.data.repositories.MovieRepo
-import domain.{Error, Movie, ID}
-
 
 object MovieEndpoints:
   val add = endpoint
