@@ -2,11 +2,11 @@ package backend
 
 import zio.*
 import zio.http.*
+
 import sttp.tapir.*
-import sttp.tapir.server.netty.NettyFutureServer
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
-import sttp.tapir.ztapir.ZServerEndpoint
+
 import movie.MovieEndpoints
 import data.dbLayer
 import data.repositories.{MovieRepo, MovieRepoLive}

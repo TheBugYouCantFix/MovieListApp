@@ -4,8 +4,6 @@ import zio.*
 import com.augustnagro.magnum.magzio.*
 import com.augustnagro.magnum.magzio.Transactor.*
 
-import javax.sql.DataSource
-
 import domain.{ID, Movie}
 import tables.*
 

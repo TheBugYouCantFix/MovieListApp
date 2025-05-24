@@ -2,7 +2,6 @@ package backend.movie
 
 import zio.*
 
-import backend.data.dataSource
 import backend.data.repositories.MovieRepo
 import domain.*
 

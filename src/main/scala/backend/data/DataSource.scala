@@ -1,11 +1,7 @@
 package backend.data
 
-import zio.*
-
 import com.augustnagro.magnum.magzio.*
 import com.zaxxer.hikari.HikariDataSource
-
-import javax.sql.DataSource
 
 val dataSource = {
   val hikari = new HikariDataSource()
