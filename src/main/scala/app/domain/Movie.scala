@@ -3,8 +3,10 @@ package app.domain
 import io.circe.*
 import io.circe.generic.semiauto.*
 
+import app.domain.ID
+
 case class Movie(
-                  uid: Long, // ID of a user which the movie is associated with
+                  uid: ID, // ID of a user which the movie is associated with
                   name: String,
                   rating: Int,
                   review: String
