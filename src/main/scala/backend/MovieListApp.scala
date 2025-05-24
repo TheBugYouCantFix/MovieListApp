@@ -2,14 +2,14 @@ package backend
 
 import zio.*
 import zio.http.*
-
 import sttp.tapir.*
 import sttp.tapir.server.netty.NettyFutureServer
 import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import sttp.tapir.ztapir.ZServerEndpoint
-
 import movie.MovieEndpoints
+import data.dbLayer
+import data.repositories.{MovieRepo, MovieRepoLive}
 
 object MovieListApp extends ZIOAppDefault:
   val swaggerEndpoints =
@@ -20,7 +20,7 @@ object MovieListApp extends ZIOAppDefault:
         "1.0"
       )
 
-  val app: Routes[Any, Response] = 
+  val app = 
     ZioHttpInterpreter().toHttp(
       MovieEndpoints.endpoints ++ swaggerEndpoints
     )
@@ -31,6 +31,8 @@ object MovieListApp extends ZIOAppDefault:
       .serve(app)
       .provide(
         ZLayer.succeed(Server.Config.default.port(8080)),
+        MovieRepoLive.layer,
+        dbLayer,
         Server.live
       )
       .exitCode
