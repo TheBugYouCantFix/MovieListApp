@@ -4,7 +4,7 @@ import app.domain
 import com.augustnagro.magnum.*
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
-case class User(
+final case class User(
                @Id uid: domain.ID,
                username: String,
                passwordHash: String

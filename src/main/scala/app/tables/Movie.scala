@@ -6,7 +6,7 @@ import com.augustnagro.magnum.*
 
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
-case class Movie(
+final case class Movie(
                   @Id movieId: ID,
                   uid: ID, // ID of a user which the movie is associated with
                   name: String,
