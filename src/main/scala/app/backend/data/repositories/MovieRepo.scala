@@ -12,8 +12,8 @@ trait MovieRepo:
   def add(movie: domain.Movie): Task[Unit]
   def getById(id: ID): Task[Option[domain.Movie]]
   def getAll: Task[Vector[domain.Movie]]
-  def updateMovie(id: ID, movie: domain.Movie): Task[Unit]
-  def removeById(id: ID): Task[Unit] // name deleteById would shadow the db codec method name
+  def updateTo(id: ID, movie: domain.Movie): Task[Unit]
+  def removeById(id: ID): Task[Unit]
 
 final case class MovieRepoLive(xa: Transactor) extends Repo[domain.Movie, Movie, ID] with MovieRepo:
   override def add(movie: domain.Movie): Task[Unit] =
@@ -21,7 +21,7 @@ final case class MovieRepoLive(xa: Transactor) extends Repo[domain.Movie, Movie,
       insert(movie)
     }
 
-  override def getById(id: ID): Task[Option[domain.Movie]] = 
+  override def getById(id: ID): Task[Option[domain.Movie]] =
     xa.transact {
       findById(id).map(_.toDomain)
     }
@@ -31,7 +31,7 @@ final case class MovieRepoLive(xa: Transactor) extends Repo[domain.Movie, Movie,
       findAll.map(_.toDomain)
     }
 
-  override def updateMovie(id: ID, movie: domain.Movie): Task[Unit] = 
+  override def updateTo(id: ID, movie: domain.Movie): Task[Unit] =
     xa.transact {
      update(tables.Movie.fromDomain(id, movie))
     }
