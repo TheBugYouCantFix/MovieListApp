@@ -1,18 +1,21 @@
 package app.tables
 
-import app.domain
 import com.augustnagro.magnum.*
+
+import app.domain
+import app.domain.UserId
+import app.utils.given 
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 final case class User(
-               @Id uid: domain.ID,
+               @Id uid: UserId,
                username: String,
                passwordHash: String
                ):
   val toDomain: domain.User = domain.User(username, passwordHash)
   
 object User:
-  def fromDomain(id: domain.ID, user: domain.User): User =
+  def fromDomain(id: UserId, user: domain.User): User =
     User(id, user.username, user.passwordHash)
 
 

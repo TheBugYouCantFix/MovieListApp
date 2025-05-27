@@ -1,7 +1,7 @@
 package app.backend.movie
 
 import app.backend.data.repositories.MovieRepo
-import app.domain.{Error, ID, Movie}
+import app.domain.{Error, MovieId, Movie}
 
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
@@ -16,21 +16,21 @@ object MovieEndpoints:
 
   val getById = endpoint
     .get
-    .in("movie" / path[Long])
+    .in("movie" / path[MovieId])
     .out(jsonBody[Movie])
     .errorOut(jsonBody[Error])
     .zServerLogic(MovieHandlers.getMovieByIdHandler)
 
   val update = endpoint
     .put
-    .in(path[ID])
+    .in(path[MovieId])
     .in(jsonBody[Movie])
     .errorOut(jsonBody[Error])
     .zServerLogic(MovieHandlers.updateMovieHandler)
 
   val delete = endpoint
     .delete
-    .in("deleteMovie" / path[Long])
+    .in("deleteMovie" / path[MovieId])
     .errorOut(jsonBody[Error])
     .zServerLogic(MovieHandlers.removeMovieByIdHandler)
 
