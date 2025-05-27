@@ -1,6 +1,6 @@
 package app.backend.data.repositories
 
-import app.domain.ID
+import app.domain.UserId
 import app.{domain, tables}
 import app.tables.User
 
@@ -10,18 +10,18 @@ import com.augustnagro.magnum.magzio.Transactor.*
 
 trait UserRepo:
   def add(user: domain.User): Task[Unit]
-  def getById(id: ID): Task[Option[domain.User]]
+  def getById(id: UserId): Task[Option[domain.User]]
   def getAll: Task[Vector[domain.User]]
-  def updateTo(id: ID, user: domain.User): Task[Unit]
-  def removeById(id: ID): Task[Unit]
+  def updateTo(id: UserId, user: domain.User): Task[Unit]
+  def removeById(id: UserId): Task[Unit]
 
-final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, ID] with UserRepo:
+final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, UserId] with UserRepo:
   override def add(user: domain.User): Task[Unit] =
     xa.transact {
       insert(user)
     }
 
-  override def getById(id: ID): Task[Option[domain.User]] =
+  override def getById(id: UserId): Task[Option[domain.User]] =
     xa.transact {
       findById(id).map(_.toDomain)
     }
@@ -31,12 +31,12 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, ID
       findAll.map(_.toDomain)
     }
 
-  override def updateTo(id: ID, user: domain.User): Task[Unit] =
+  override def updateTo(id: UserId, user: domain.User): Task[Unit] =
     xa.transact {
       update(tables.User.fromDomain(id, user))
     }
 
-  override def removeById(id: ID): Task[Unit] =
+  override def removeById(id: UserId): Task[Unit] =
     xa.transact {
       deleteById(id)
     }
