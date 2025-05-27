@@ -7,6 +7,7 @@ import zio.*
 
 object MovieHandlers:
   def addMovieHandler(movie: Movie): ZIO[MovieRepo, domain.Error, Unit] =
+    ZIO.serviceWithZIO[MovieRepo](_.add(movie)).mapError(e => MovieError(e.getMessage))
   
   def getMovieByIdHandler(id: ID): ZIO[MovieRepo, domain.Error, Movie] = 
     ZIO.serviceWithZIO[MovieRepo](_.getById(id))
