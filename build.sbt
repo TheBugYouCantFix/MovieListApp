@@ -32,6 +32,6 @@ lazy val root = (project in file("."))
       "com.zaxxer"    % "HikariCP"    % "5.0.1", // connection pool
       "org.postgresql" % "postgresql" % "42.7.3",
 
-      "io.github.iltotore" %% "iron" % "3.0.0",
+      "io.github.iltotore" %% "iron" % "2.6.0",
     )
   )
