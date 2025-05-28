@@ -4,7 +4,6 @@ ThisBuild / scalaVersion := "3.3.5"
 
 val zioHttpVersion = "3.2.0"
 val zioVersion = "2.1.17"
-val circeVersion = "0.14.12"
 val sttpVersion = "4.0.2"
 val tapirVersion = "1.11.29"
 
@@ -14,10 +13,6 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.client4" %% "core" % sttpVersion,
       "com.softwaremill.sttp.client4" %% "circe" % sttpVersion,
-
-      "io.circe" %% "circe-core" % circeVersion,
-      "io.circe" %% "circe-generic" % circeVersion,
-      "io.circe" %% "circe-parser" % circeVersion,
 
       "dev.zio" %% "zio" % zioVersion,
 
@@ -33,5 +28,6 @@ lazy val root = (project in file("."))
       "org.postgresql" % "postgresql" % "42.7.3",
 
       "io.github.iltotore" %% "iron" % "2.6.0",
+      "io.github.iltotore" %% "iron-circe" % "2.6.0"
     )
   )
