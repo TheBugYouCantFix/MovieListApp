@@ -7,6 +7,9 @@ import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 
+import io.github.iltotore.iron.circe.given
+//import sttp.tapir.codec.iron
+
 object MovieEndpoints:
   val add = endpoint
     .post

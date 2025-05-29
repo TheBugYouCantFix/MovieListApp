@@ -3,6 +3,7 @@ package app.backend.data.repositories
 import app.domain.MovieId
 import app.{domain, tables}
 import app.tables.Movie
+import app.utils.given 
 
 import zio.*
 import com.augustnagro.magnum.magzio.*

@@ -3,6 +3,7 @@ package app.backend.data.repositories
 import app.domain.UserId
 import app.{domain, tables}
 import app.tables.User
+import app.utils.given 
 
 import zio.*
 import com.augustnagro.magnum.magzio.*

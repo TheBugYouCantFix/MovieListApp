@@ -2,6 +2,7 @@ package app.domain
 
 import io.circe.*
 import io.circe.generic.semiauto.*
+import io.github.iltotore.iron.circe.given
 
 import app.domain.MovieId
 
