@@ -1,6 +1,6 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
-ThisBuild / scalaVersion := "3.3.5"
+ThisBuild / scalaVersion := "3.6.4"
 
 val zioHttpVersion = "3.2.0"
 val zioVersion = "2.1.17"
@@ -22,14 +22,14 @@ lazy val root = (project in file("."))
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-netty-server-zio" % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
-//      "com.softwaremill.sttp.tapir" %% "tapir-iron" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-iron" % tapirVersion,
 
 
       "com.augustnagro" %% "magnumzio" % "2.0.0-M1",
       "com.zaxxer"    % "HikariCP"    % "5.0.1", // connection pool
       "org.postgresql" % "postgresql" % "42.7.3",
 
-      "io.github.iltotore" %% "iron" % "2.6.0",
+      "io.github.iltotore" %% "iron" % "3.0.0",
       "io.github.iltotore" %% "iron-circe" % "2.6.0"
     )
   )
