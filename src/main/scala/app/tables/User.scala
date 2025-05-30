@@ -15,6 +15,7 @@ final case class User(
   val toDomain: domain.User = domain.User(username, passwordHash)
   
 object User:
+  val table = TableInfo[domain.User, User, UserId]
   def fromDomain(id: UserId, user: domain.User): User =
     User(id, user.username, user.passwordHash)
 

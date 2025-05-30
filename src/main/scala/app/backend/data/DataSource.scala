@@ -2,6 +2,7 @@ package app.backend.data
 
 import com.augustnagro.magnum.magzio.*
 import com.zaxxer.hikari.HikariDataSource
+import zio.ZLayer
 
 val dataSource = {
   val hikari = new HikariDataSource()
@@ -12,4 +13,8 @@ val dataSource = {
   hikari
 }
 
-val dbLayer = Transactor.layer(dataSource)
+val dbLayer =
+  for
+    xa <- Transactor.layer(dataSource)
+    _ <- ZLayer(createTables(xa.get))
+  yield xa
