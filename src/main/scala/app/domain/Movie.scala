@@ -4,10 +4,10 @@ import io.circe.*
 
 import sttp.tapir.Schema
 
-import app.domain.MovieId
+import app.domain.{MovieId, BaseIdType}
 
-given Encoder[MovieId] = Encoder[Long].contramap(identity)
-given Decoder[MovieId] = Decoder[Long].emap(MovieId.either)
+given Encoder[MovieId] = Encoder[BaseIdType].contramap(identity)
+given Decoder[MovieId] = Decoder[BaseIdType].emap(MovieId.either)
 given Schema[MovieId] = Schema.schemaForLong.as[MovieId]
 
 case class Movie(
