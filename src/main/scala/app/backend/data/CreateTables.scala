@@ -10,8 +10,8 @@ def createTables(xa: Transactor) =
       sql"""
           CREATE TABLE IF NOT EXISTS ${tables.User.table}(
             ${tables.User.table.uid}          SERIAL  NOT NULL,
-            ${tables.User.table.username}     VARCHAR(255) NOT NULL UNIQUE,
-            ${tables.User.table.passwordHash} VARCHAR(255) NOT NULL UNIQUE,
+            ${tables.User.table.username}     VARCHAR(255) NOT NULL,
+            ${tables.User.table.passwordHash} VARCHAR(255) NOT NULL,
             PRIMARY KEY(${tables.User.table.uid})
            """
 
