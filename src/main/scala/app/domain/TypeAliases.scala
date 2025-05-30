@@ -2,7 +2,6 @@ package app.domain
 
 import io.github.iltotore.iron.*
 import io.github.iltotore.iron.constraint.all.*
-import sttp.tapir.codec.iron
 
 type BaseIdType = Long
 

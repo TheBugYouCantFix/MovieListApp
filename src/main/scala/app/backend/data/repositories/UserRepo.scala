@@ -7,7 +7,6 @@ import app.utils.given
 
 import zio.*
 import com.augustnagro.magnum.magzio.*
-import com.augustnagro.magnum.magzio.Transactor.*
 
 trait UserRepo:
   def add(user: domain.User): Task[Unit]

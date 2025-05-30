@@ -1,7 +1,6 @@
 package app.domain
 
 import io.circe.*
-import io.circe.generic.semiauto.*
 
 case class User(
                  username: String,

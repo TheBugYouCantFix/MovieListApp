@@ -1,10 +1,7 @@
 package app.domain
 
 import io.circe.*
-import io.circe.generic.semiauto.*
-import io.github.iltotore.iron.circe.*
 
-import sttp.tapir.codec.iron.given
 import sttp.tapir.Schema
 
 import app.domain.MovieId

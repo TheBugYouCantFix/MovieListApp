@@ -2,7 +2,7 @@ package app.utils
 
 import app.domain.{MovieId, MovieIdDescription, BaseIdType}
 import com.augustnagro.magnum.DbCodec
-import io.github.iltotore.iron.*
+
 import sttp.tapir.*
 import io.github.iltotore.iron.*
 import sttp.tapir.CodecFormat.TextPlain
