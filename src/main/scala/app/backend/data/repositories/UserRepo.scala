@@ -11,7 +11,8 @@ import com.augustnagro.magnum.magzio.*
 trait UserRepo:
   def add(user: domain.User): Task[Unit]
   def getById(id: UserId): Task[Option[domain.User]]
-  def updateTo(id: UserId, user: domain.User): Task[Unit]
+  def updateUsername(id: UserId, username: Username, user: domain.User): Task[Unit]
+  def updatePasswordHash(id: UserId, passwordHash: String, user: domain.User): Task[Unit]
   def removeById(id: UserId): Task[Unit]
   def areCredentialsValid(username: Username, passwordHash: String): Task[Boolean]
 
@@ -26,11 +27,17 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, Us
       findById(id).map(_.toDomain)
     }
 
-  override def updateTo(id: UserId, user: domain.User): Task[Unit] =
+  def updateTo(id: UserId, user: domain.User): Task[Unit] =
     xa.transact {
       update(tables.User.fromDomain(id, user))
     }
 
+  override def updateUsername(id: UserId, username: Username, user: domain.User): Task[Unit] =
+    updateTo(id, user.copy(username = username))
+
+  override def updatePasswordHash(id: UserId, passwordHash: String, user: domain.User): Task[Unit] = 
+    updateTo(id, user.copy(passwordHash = passwordHash))
+    
   override def removeById(id: UserId): Task[Unit] =
     xa.transact {
       deleteById(id)
