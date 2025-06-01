@@ -17,15 +17,11 @@ inline given ironDbCodec[T, Description](
     identity
   )
 
-given Codec[String, MovieId, TextPlain] =
-  Codec.long.mapEither { long =>
-    long.refineEither[MovieIdDescription] match {
-      case Right(movieId: MovieId) => Right(movieId)
-      case Left(error) => Left(s"Invalid MovieId: $error")
-    }
-  }(_.assume[BaseIdType])
 given [A, C](using baseDecoder: Decoder[A], constraint: RuntimeConstraint[A, C]): Decoder[A :| C] =
   baseDecoder.emap(_.refineEither[C])
 
 given [A, C](using baseEncoder: Encoder[A]): Encoder[A :| C] =
   baseEncoder.contramap(identity)
+
+given [A, C](using baseSchema: Schema[A]): Schema[A :| C] =
+  baseSchema.map(Some(_))()
