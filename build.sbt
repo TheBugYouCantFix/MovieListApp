@@ -30,5 +30,7 @@ lazy val root = (project in file("."))
 
       "io.github.iltotore" %% "iron" % ironVersion,
       "io.github.iltotore" %% "iron-circe" % ironVersion,
+
+      "com.github.roundrop" %% "scala3-bcrypt" % "0.1.0"
     )
   )
