@@ -42,7 +42,7 @@ final case class MovieRepoLive(xa: Transactor) extends Repo[domain.Movie, Movie,
     }
 
 
-object MovieRepoLive:
+object MovieRepo:
   val layer: RLayer[Transactor, MovieRepo] =
     ZLayer.fromFunction(MovieRepoLive(_))
     

@@ -31,7 +31,7 @@ object MovieListApp extends ZIOAppDefault:
       .serve(app)
       .provide(
         ZLayer.succeed(Server.Config.default.port(8080)),
-        MovieRepoLive.layer,
+        MovieRepo.layer,
         dbLayer,
         Server.live
       )

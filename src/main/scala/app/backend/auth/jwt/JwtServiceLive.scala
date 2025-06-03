@@ -49,6 +49,6 @@ case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
       }
     )
     
-object JwtServiceLive:
+object JwtService:
   val layer: RLayer[JwtConfig, JwtServiceLive] =
     ZLayer.fromFunction(JwtServiceLive(_))

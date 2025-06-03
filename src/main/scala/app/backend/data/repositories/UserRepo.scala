@@ -57,7 +57,7 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, Us
 
 
 
-object UserRepoLive:
+object UserRepo:
   val layer: RLayer[Transactor, UserRepo] =
     ZLayer.fromFunction(UserRepoLive(_))
 
