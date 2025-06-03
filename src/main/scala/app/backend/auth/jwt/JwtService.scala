@@ -37,3 +37,6 @@ case class JwtService(jwtConfig: JwtConfig):
       }
     )
     
+object JwtService:
+  val layer: RLayer[JwtConfig, JwtService] =
+    ZLayer.fromFunction(JwtService(_))
