@@ -10,11 +10,16 @@ import scala.util.Try
 
 import app.domain.UserId
 
-
-case class JwtService(jwtConfig: JwtConfig):
+trait JwtService:
+  def jwtEncode(userId: UserId): Task[String]
+  def jwtDecodeSync(token: String): Try[JwtClaim]
+  def jwtDecode(token: String): Task[JwtClaim]
+  
+case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
   def jwtEncode(userId: UserId): Task[String] = ZIO.succeed(
     JwtCirce.encode(jwtConfig.claim(userId))
   )
+  
   
   def jwtDecodeSync(token: String): Try[JwtClaim] =
     JwtCirce.decode(
@@ -44,6 +49,6 @@ case class JwtService(jwtConfig: JwtConfig):
       }
     )
     
-object JwtService:
-  val layer: RLayer[JwtConfig, JwtService] =
-    ZLayer.fromFunction(JwtService(_))
+object JwtServiceLive:
+  val layer: RLayer[JwtConfig, JwtServiceLive] =
+    ZLayer.fromFunction(JwtServiceLive(_))
