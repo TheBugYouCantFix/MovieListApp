@@ -14,7 +14,7 @@ trait UserRepo:
   def updateUsername(id: UserId, username: Username, user: domain.User): Task[Unit]
   def updatePasswordHash(id: UserId, passwordHash: String, user: domain.User): Task[Unit]
   def removeById(id: UserId): Task[Unit]
-  def areCredentialsValid(username: Username, passwordHash: String): Task[Boolean]
+  def getUidByCredentials(username: Username, passwordHash: String): Task[Option[UserId]]
 
 final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, UserId] with UserRepo:
   override def add(user: domain.User): Task[Unit] =
@@ -43,17 +43,16 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, Us
       deleteById(id)
     }
 
-  override def areCredentialsValid(username: Username, passwordHash: String): Task[Boolean] =
+  override def getUidByCredentials(username: Username, passwordHash: String): Task[Option[UserId]] =
      xa.transact {
       val frag =
         sql"""
-          SELECT EXISTS (
-            SELECT 1 FROM users
-            WHERE username = $username AND password_hash = $passwordHash
-          )
+          SELECT uid FROM ${tables.User.table} 
+          WHERE username = $username AND password_hash = $passwordHash
+          LIMIT 1
           """
 
-      frag.query[Boolean].run().head
+      frag.query[Option[UserId]].run().head
     }
 
 
