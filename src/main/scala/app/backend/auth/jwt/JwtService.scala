@@ -3,6 +3,9 @@ package app.backend.auth.jwt
 import pdi.jwt.algorithms.JwtHmacAlgorithm
 import pdi.jwt.{JwtCirce, JwtClaim}
 
+import zio.*
+import zio.http.*
+
 import scala.util.Try
 
 case class JwtService(jwtConfig: JwtConfig):
@@ -11,3 +14,23 @@ case class JwtService(jwtConfig: JwtConfig):
   def jwtDecode(token: String): Try[JwtClaim] = JwtCirce.decode(
     token, jwtConfig.secretKey, Seq(jwtConfig.algorithm.asInstanceOf[JwtHmacAlgorithm])
   )
+
+  val bearerAuthWithContext: HandlerAspect[Any, String] =
+    HandlerAspect.interceptIncomingHandler(
+      Handler.fromFunctionZIO[Request] {
+        req => req.header(Header.Authorization) match
+          case Some(Header.Authorization.Bearer(token)) =>
+            ZIO
+              .fromTry(jwtDecode(token.value.asString))
+              .orElseFail(Response.badRequest("Invalid or expired token!"))
+              .flatMap(
+                claim => ZIO.fromOption(claim.subject)
+                  .orElseFail(Response.badRequest("Missing subject claim!"))
+              )
+              .map(u => (req, u))
+
+          case _ => ZIO.fail(Response.unauthorized.addHeader(
+            Header.WWWAuthenticate.Bearer(realm = "Access")
+          ))
+      }
+    )
