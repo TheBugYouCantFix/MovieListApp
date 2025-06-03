@@ -7,7 +7,7 @@ import app.utils.given
 
 case class UpdateUsername(
                           credentials: Credentials,
-                          username: Username
+                          newUsername: Username
                          ) derives Codec.AsObject
 
 

@@ -7,7 +7,7 @@ import app.utils.given
 
 case class UpdatePassword(
                              credentials: Credentials,
-                             password: Password
+                             newPassword: Password
                              ) derives Codec.AsObject
 
 
