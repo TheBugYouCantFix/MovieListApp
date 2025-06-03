@@ -6,7 +6,7 @@ import javax.crypto.spec.SecretKeySpec
 import java.time.Instant
 import app.domain.UserId
 import pdi.jwt.JwtAlgorithm.HS512
-import zio.{RLayer, ZLayer}
+import zio.{RLayer, ULayer, ZLayer}
 
 case class JwtConfig(
                       key: String,
@@ -33,5 +33,5 @@ object JwtConfig:
   val customLayer: RLayer[Env, JwtConfig] =
     ZLayer.fromFunction(JwtConfig(_, _, _))
 
-  val defaultLayer: RLayer[UserId, JwtConfig] =
-    ZLayer.fromFunction(JwtConfig(defaultKey, defaultAlgorithm, defaultDurationInSecs))
+  val defaultLayer: ULayer[JwtConfig] =
+    ZLayer.succeed(JwtConfig(defaultKey, defaultAlgorithm, defaultDurationInSecs))
