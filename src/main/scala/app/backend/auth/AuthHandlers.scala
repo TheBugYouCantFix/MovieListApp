@@ -12,8 +12,6 @@ import zio.*
 
 
 object AuthHandlers:
-  def loginHandler(credentials: Credentials): ZIO[UserRepo, domain.Error, Unit] =
-    ???
   private type AuthEnv = UserRepo & JwtService
   private def hashPassword(password: Password): ZIO[Any, PasswordHashingFailedError, String] =
     ZIO
@@ -38,6 +36,16 @@ object AuthHandlers:
         case Some(uid: UserId) => generateToken(uid) 
         case None => ZIO.fail(InvalidCredentialsError())
 
-
-
     yield token
+    
+  def signupHandler(credentials: Credentials): ZIO[AuthEnv, Error, String] = 
+    for
+      passwordHash <- hashPassword(credentials.password)
+      
+      uid <- ZIO.serviceWithZIO[UserRepo](_.add(
+        User(credentials.username, passwordHash) 
+      )).mapError(e => AuthError(e.getMessage))
+      
+      token <- generateToken(uid)
+    yield token 
+    
