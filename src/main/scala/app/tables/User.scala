@@ -12,7 +12,7 @@ final case class User(
                passwordHash: String
                ):
   val toDomain: domain.User = domain.User(username, passwordHash)
-  
+
 object User:
   val table = TableInfo[domain.User, User, UserId]
   def fromDomain(id: UserId, user: domain.User): User =
