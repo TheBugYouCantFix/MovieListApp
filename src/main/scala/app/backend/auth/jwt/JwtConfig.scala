@@ -9,13 +9,13 @@ import pdi.jwt.JwtAlgorithm.HS512
 import zio.{RLayer, ZLayer}
 
 case class JwtConfig(
-                      userId: UserId,
                       key: String,
-                      algorithm: JwtAlgorithm
+                      algorithm: JwtAlgorithm,
+                      durationInSecs: Int
                     ):
-    val claim: JwtClaim = JwtClaim(
+    def claim(userId: UserId): JwtClaim = JwtClaim(
       subject = Some(userId.toString),
-      expiration = Some(Instant.now.plusSeconds(900).getEpochSecond),
+      expiration = Some(Instant.now.plusSeconds(durationInSecs).getEpochSecond),
       issuedAt = Some(Instant.now.getEpochSecond)
     )
 
@@ -26,10 +26,12 @@ case class JwtConfig(
 object JwtConfig:
   private val defaultKey: String = "change-me-in-production"
   private val defaultAlgorithm: JwtAlgorithm = HS512
-  private type Env = UserId & String & JwtAlgorithm
+  private val defaultDurationInSecs: Int = 900
+  
+  private type Env = String & JwtAlgorithm & Int
 
   val customLayer: RLayer[Env, JwtConfig] =
     ZLayer.fromFunction(JwtConfig(_, _, _))
 
   val defaultLayer: RLayer[UserId, JwtConfig] =
-    ZLayer.fromFunction(JwtConfig(_, defaultKey, defaultAlgorithm))
+    ZLayer.fromFunction(JwtConfig(defaultKey, defaultAlgorithm, defaultDurationInSecs))

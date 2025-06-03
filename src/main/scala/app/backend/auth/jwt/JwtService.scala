@@ -8,8 +8,10 @@ import zio.http.*
 
 import scala.util.Try
 
+import app.domain.UserId
+
 case class JwtService(jwtConfig: JwtConfig):
-  def jwtEncode: String = JwtCirce.encode(jwtConfig.claim)
+  def jwtEncode(userId: UserId): String = JwtCirce.encode(jwtConfig.claim(userId))
 
   def jwtDecode(token: String): Try[JwtClaim] = JwtCirce.decode(
     token, jwtConfig.secretKey, Seq(jwtConfig.algorithm.asInstanceOf[JwtHmacAlgorithm])
@@ -34,3 +36,4 @@ case class JwtService(jwtConfig: JwtConfig):
           ))
       }
     )
+    
