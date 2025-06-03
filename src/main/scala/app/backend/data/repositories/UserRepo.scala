@@ -9,7 +9,7 @@ import zio.*
 import com.augustnagro.magnum.magzio.*
 
 trait UserRepo:
-  def add(user: domain.User): Task[Unit]
+  def add(user: domain.User): Task[UserId]
   def getById(id: UserId): Task[Option[domain.User]]
   def updateUsername(id: UserId, username: Username, user: domain.User): Task[Unit]
   def updatePasswordHash(id: UserId, passwordHash: String, user: domain.User): Task[Unit]
@@ -17,9 +17,9 @@ trait UserRepo:
   def getUidByCredentials(username: Username, passwordHash: String): Task[Option[UserId]]
 
 final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, UserId] with UserRepo:
-  override def add(user: domain.User): Task[Unit] =
+  override def add(user: domain.User): Task[UserId] =
     xa.transact {
-      insert(user)
+      insertReturning(user).uid
     }
 
   override def getById(id: UserId): Task[Option[domain.User]] =
