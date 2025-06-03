@@ -10,11 +10,19 @@ import scala.util.Try
 
 import app.domain.UserId
 
-case class JwtService(jwtConfig: JwtConfig):
-  def jwtEncode(userId: UserId): String = JwtCirce.encode(jwtConfig.claim(userId))
 
-  def jwtDecode(token: String): Try[JwtClaim] = JwtCirce.decode(
-    token, jwtConfig.secretKey, Seq(jwtConfig.algorithm.asInstanceOf[JwtHmacAlgorithm])
+case class JwtService(jwtConfig: JwtConfig):
+  def jwtEncode(userId: UserId): Task[String] = ZIO.succeed(
+    JwtCirce.encode(jwtConfig.claim(userId))
+  )
+  
+  def jwtDecodeSync(token: String): Try[JwtClaim] =
+    JwtCirce.decode(
+      token, jwtConfig.secretKey, Seq(jwtConfig.algorithm.asInstanceOf[JwtHmacAlgorithm])
+    )
+
+  def jwtDecode(token: String): Task[JwtClaim] = ZIO.fromTry(
+    jwtDecodeSync(token)
   )
 
   val bearerAuthWithContext: HandlerAspect[Any, String] =
@@ -22,8 +30,7 @@ case class JwtService(jwtConfig: JwtConfig):
       Handler.fromFunctionZIO[Request] {
         req => req.header(Header.Authorization) match
           case Some(Header.Authorization.Bearer(token)) =>
-            ZIO
-              .fromTry(jwtDecode(token.value.asString))
+            jwtDecode(token.value.asString)
               .orElseFail(Response.badRequest("Invalid or expired token!"))
               .flatMap(
                 claim => ZIO.fromOption(claim.subject)
