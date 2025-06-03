@@ -1,17 +1,13 @@
 package app.backend.auth.jwt
 
-import app.domain.UserId
-import pdi.jwt.{JwtAlgorithm, JwtCirce, JwtClaim}
+import pdi.jwt.algorithms.JwtHmacAlgorithm
+import pdi.jwt.{JwtCirce, JwtClaim}
 
-import java.time.Instant
 import scala.util.Try
 
 case class JwtService(jwtConfig: JwtConfig):
-  def jwtEncode(userId: UserId): String =
-    JwtCirce.encode(
-      JwtClaim(subject = Some(userId.))
-    )  
+  def jwtEncode: String = JwtCirce.encode(jwtConfig.claim)
 
   def jwtDecode(token: String): Try[JwtClaim] = JwtCirce.decode(
-    token, jwtConfig.key, Seq(jwtConfig.algorithm)
+    token, jwtConfig.secretKey, Seq(jwtConfig.algorithm.asInstanceOf[JwtHmacAlgorithm])
   )
