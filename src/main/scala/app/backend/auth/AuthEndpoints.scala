@@ -3,7 +3,7 @@ package app.backend.auth
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
-import app.backend.auth.requestmodels.{DeleteUser, UpdatePassword}
+import app.backend.auth.requestmodels.UpdatePassword
 import app.backend.data.repositories.UserRepo
 import app.domain.{Credentials, Error}
 import app.utils.given
@@ -27,7 +27,7 @@ object AuthEndpoints:
     .errorOut(jsonBody[Error])
   val deleteAccount = endpoint
     .delete
-    .in(jsonBody[DeleteUser])
+    .in(jsonBody[Credentials])
     .errorOut(jsonBody[Error])
 
   val endpoints = List(login, signup, updateUsername, updatePassword, deleteAccount)
