@@ -3,7 +3,7 @@ package app.backend.auth
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
-import app.backend.auth.request_models.{DeleteUser, UpdatePassword}
+import app.backend.auth.requestmodels.{DeleteUser, UpdatePassword}
 import app.backend.data.repositories.UserRepo
 import app.domain.{Credentials, Error}
 import app.utils.given

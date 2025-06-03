@@ -1,4 +1,4 @@
-package app.backend.auth.request_models
+package app.backend.auth.requestmodels
 
 import io.circe.*
 
