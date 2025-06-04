@@ -1,18 +1,17 @@
 package app.backend.data.repositories
 
-import app.domain.{UserId, Username}
+import app.domain.{NoUserWithGivenIdError, UserId, Username}
 import app.{domain, tables}
 import app.tables.User
 import app.utils.given
-
 import zio.*
 import com.augustnagro.magnum.magzio.*
 
 trait UserRepo:
   def add(user: domain.User): Task[UserId]
   def getById(id: UserId): Task[Option[domain.User]]
-  def updateUsername(id: UserId, username: Username, user: domain.User): Task[Unit]
-  def updatePasswordHash(id: UserId, passwordHash: String, user: domain.User): Task[Unit]
+  def updateUsername(id: UserId, username: Username): Task[Unit]
+  def updatePasswordHash(id: UserId, passwordHash: String): Task[Unit]
   def removeById(id: UserId): Task[Unit]
   def getUidByCredentials(username: Username, passwordHash: String): Task[Option[UserId]]
 
@@ -32,11 +31,21 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, Us
       update(tables.User.fromDomain(id, user))
     }
 
-  override def updateUsername(id: UserId, username: Username, user: domain.User): Task[Unit] =
-    updateTo(id, user.copy(username = username))
+  override def updateUsername(id: UserId, username: Username): Task[Unit] = 
+    for 
+      user <- getById(id)
+      _ <- user match
+        case Some(u) => updateTo(id, u.copy(username = username))
+        case None => ZIO.fail(NoUserWithGivenIdError())
+    yield ()
 
-  override def updatePasswordHash(id: UserId, passwordHash: String, user: domain.User): Task[Unit] = 
-    updateTo(id, user.copy(passwordHash = passwordHash))
+  override def updatePasswordHash(id: UserId, passwordHash: String): Task[Unit] =
+    for
+      user <- getById(id)
+      _ <- user match
+        case Some(u) => updateTo(id, u.copy(passwordHash = passwordHash))
+        case None => ZIO.fail(NoUserWithGivenIdError())
+    yield ()
     
   override def removeById(id: UserId): Task[Unit] =
     xa.transact {
