@@ -61,7 +61,7 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, Us
           LIMIT 1
           """
 
-      frag.query[Option[UserId]].run().head
+      frag.query[UserId].run().headOption
     }
 
 
