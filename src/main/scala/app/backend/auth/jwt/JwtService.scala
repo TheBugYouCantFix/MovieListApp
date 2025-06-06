@@ -14,6 +14,7 @@ trait JwtService:
   def jwtEncode(userId: UserId): Task[String]
   def jwtDecodeSync(token: String): Try[JwtClaim]
   def jwtDecode(token: String): Task[JwtClaim]
+  val bearerAuthWithContext: HandlerAspect[Any, String]
   
 case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
   def jwtEncode(userId: UserId): Task[String] = ZIO.succeed(
