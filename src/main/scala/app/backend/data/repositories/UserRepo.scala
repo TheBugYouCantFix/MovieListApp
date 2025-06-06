@@ -56,7 +56,7 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, Us
      xa.transact {
       val frag =
         sql"""
-          SELECT ${tables.User.table.uid} FROM ${tables.User.table} 
+          SELECT ${tables.User.table.uid} FROM "${tables.User.table}"
           WHERE username = $username AND password_hash = $passwordHash
           LIMIT 1
           """
