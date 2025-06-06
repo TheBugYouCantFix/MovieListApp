@@ -16,6 +16,7 @@ lazy val root = (project in file("."))
       "com.softwaremill.sttp.client4" %% "circe" % sttpVersion,
 
       "dev.zio" %% "zio" % zioVersion,
+      "dev.zio" %% "zio-logging-jul-bridge" % "2.4.0",
 
       "com.softwaremill.sttp.tapir" %% "tapir-zio-http-server" % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-core" % tapirVersion,
