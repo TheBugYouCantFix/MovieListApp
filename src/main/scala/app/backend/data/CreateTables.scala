@@ -25,4 +25,7 @@ def createTables(xa: Transactor) =
             ${tables.Movie.table.uid} VARCHAR(512)
             PRIMARY KEY(${tables.Movie.table.movieId})
         """
+
+    userTable.update.run()
+    movieTable.update.run()
   }
