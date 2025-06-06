@@ -7,7 +7,7 @@ import app.domain.{MovieId, UserId}
 import app.utils.given
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
-final case class Movie(
+final case class Movies(
                   @Id movieId: MovieId,
                   uid: UserId, // ID of a user which the movie is associated with
                   name: String,
@@ -16,8 +16,8 @@ final case class Movie(
                 ) derives DbCodec:
   val toDomain: domain.Movie = domain.Movie(uid, name, rating, review)
 
-object Movie:
-  val table = TableInfo[domain.Movie, Movie, MovieId]
+object Movies:
+  val table = TableInfo[domain.Movie, Movies, MovieId]
   
-  def fromDomain(id: MovieId, movie: domain.Movie): Movie = 
-    Movie(id, movie.uid, movie.name, movie.rating, movie.review)
+  def fromDomain(id: MovieId, movie: domain.Movie): Movies = 
+    Movies(id, movie.uid, movie.name, movie.rating, movie.review)

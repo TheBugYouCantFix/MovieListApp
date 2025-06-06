@@ -2,7 +2,7 @@ package app.backend.data.repositories
 
 import app.domain.MovieId
 import app.{domain, tables}
-import app.tables.Movie
+import app.tables.Movies
 import app.utils.given 
 
 import zio.*
@@ -15,7 +15,7 @@ trait MovieRepo:
   def updateTo(id: MovieId, movie: domain.Movie): Task[Unit]
   def removeById(id: MovieId): Task[Unit]
 
-final case class MovieRepoLive(xa: Transactor) extends Repo[domain.Movie, Movie, MovieId] with MovieRepo:
+final case class MovieRepoLive(xa: Transactor) extends Repo[domain.Movie, Movies, MovieId] with MovieRepo:
   override def add(movie: domain.Movie): Task[Unit] =
     xa.transact {
       insert(movie)
@@ -33,7 +33,7 @@ final case class MovieRepoLive(xa: Transactor) extends Repo[domain.Movie, Movie,
 
   override def updateTo(id: MovieId, movie: domain.Movie): Task[Unit] =
     xa.transact {
-     update(tables.Movie.fromDomain(id, movie))
+     update(tables.Movies.fromDomain(id, movie))
     }
 
   override def removeById(id: MovieId): Task[Unit] =

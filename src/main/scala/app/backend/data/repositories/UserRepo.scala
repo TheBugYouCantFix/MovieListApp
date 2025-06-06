@@ -2,7 +2,7 @@ package app.backend.data.repositories
 
 import app.domain.{NoUserWithGivenIdError, UserId, Username}
 import app.{domain, tables}
-import app.tables.User
+import app.tables.Users
 import app.utils.given
 import zio.*
 import com.augustnagro.magnum.magzio.*
@@ -15,7 +15,7 @@ trait UserRepo:
   def removeById(id: UserId): Task[Unit]
   def getUidByCredentials(username: Username, passwordHash: String): Task[Option[UserId]]
 
-final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, UserId] with UserRepo:
+final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, Users, UserId] with UserRepo:
   override def add(user: domain.User): Task[UserId] =
     xa.transact {
       insertReturning(user).uid
@@ -28,7 +28,7 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, Us
 
   def updateTo(id: UserId, user: domain.User): Task[Unit] =
     xa.transact {
-      update(tables.User.fromDomain(id, user))
+      update(tables.Users.fromDomain(id, user))
     }
 
   override def updateUsername(id: UserId, username: Username): Task[Unit] = 
@@ -56,7 +56,7 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, User, Us
      xa.transact {
       val frag =
         sql"""
-          SELECT ${tables.User.table.uid} FROM "${tables.User.table}"
+          SELECT ${tables.Users.table.uid} FROM "${tables.Users.table}"
           WHERE username = $username AND password_hash = $passwordHash
           LIMIT 1
           """
