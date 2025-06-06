@@ -20,7 +20,7 @@ def createTables(xa: Transactor) =
       sql"""
            CREATE TABLE IF NOT EXISTS ${tables.Movies.table}(
             ${tables.Movies.table.movieId} SERIAL NOT NULL,
-            ${tables.Movies.table.uid} VARCHAR(36) NOT NULL,
+            ${tables.Movies.table.uid} INT NOT NULL,
             ${tables.Movies.table.name} VARCHAR(50) NOT NULL,
             ${tables.Movies.table.rating} INT,
             PRIMARY KEY(${tables.Movies.table.movieId}),
