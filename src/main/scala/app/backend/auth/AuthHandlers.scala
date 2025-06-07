@@ -1,7 +1,7 @@
 package app.backend.auth
 
 import zio.*
-import com.github.roundrop.bcrypt.bcrypt
+import com.github.roundrop.bcrypt.*
 import app.backend.data.repositories.UserRepo
 import app.backend.auth.jwt.JwtService
 import app.backend.auth.requestmodels.{UpdatePassword, UpdateUsername}
@@ -21,7 +21,6 @@ object AuthHandlers:
       _.jwtEncode(username)
     ).mapError(e => AuthError(e.getMessage))
 
-  private def maybeUidFromCredentials(credentials: Credentials): ZIO[AppEnv, Error, (String, Option[UserId])] =
   private def isPasswordCorrect(credentials: Credentials): ZIO[UserRepo, Error, Boolean] =
     for
       maybePassword <- ZIO.serviceWithZIO[UserRepo]
@@ -34,24 +33,23 @@ object AuthHandlers:
         ).mapError(e => AuthError(e.getMessage))
         case None => ZIO.succeed(false)
     yield res
-    for
-      passwordHash <- hashPassword(credentials.password)
 
-      maybeUid <- ZIO.serviceWithZIO[UserRepo](_.getUidByCredentials(
-        credentials.username,
-        passwordHash
+  private def executeIfPasswordCorrect[A, B](credentials: Credentials, arg: A, f: A => ZIO[AppEnv, Error, B]): ZIO[AppEnv, Error, B] =
+    for
+      ips <- isPasswordCorrect(credentials)
+      res <- if ips then f(arg) else ZIO.fail(InvalidCredentialsError())
+    yield res
+
+
+  private def maybeUidFromUsername(username: Username): ZIO[AppEnv, Error, Option[UserId]] =
+    for
+      maybeUid <- ZIO.serviceWithZIO[UserRepo](_.getUidByUsername(
+        username,
       )).mapError(e => AuthError(e.getMessage))
-    yield (passwordHash, maybeUid)
+    yield maybeUid
 
   def loginHandler(credentials: Credentials): ZIO[AppEnv, Error, String] =
-    for
-      (_, maybeUid) <- maybeUidFromCredentials(credentials)
-
-      token <- maybeUid match
-        case Some(uid: UserId) => generateToken(uid)
-        case None => ZIO.fail(InvalidCredentialsError())
-
-    yield token
+    executeIfPasswordCorrect[Username, String](credentials, credentials.username, generateToken)
 
   def signupHandler(credentials: Credentials): ZIO[AppEnv, Error, String] =
     for
@@ -64,31 +62,40 @@ object AuthHandlers:
       token <- generateToken(credentials.username)
     yield token
 
-  def updateUsernameHandler(updateUsername: UpdateUsername): ZIO[AppEnv, Error, Unit] = 
+  private def _updateUsernameHandler(updateUsername: UpdateUsername): ZIO[AppEnv, Error, Unit] =
     val creds = updateUsername.credentials
     for
-      (passwordHash, maybeUid) <- maybeUidFromCredentials(creds)
+      maybeUid <- maybeUidFromUsername(creds.username)
       uid <- ZIO.succeed(maybeUid).someOrFail(InvalidCredentialsError())
       _ <- ZIO.serviceWithZIO[UserRepo](_.updateUsername(
         uid, updateUsername.newUsername
       )).mapError(e => AuthError(e.getMessage))
     yield ()
 
-  def updatePasswordHandler(updatePassword: UpdatePassword): ZIO[AppEnv, Error, Unit] =
+  def updateUsernameHandler(updateUsername: UpdateUsername): ZIO[AppEnv, Error, Unit] =
+    executeIfPasswordCorrect[UpdateUsername, Unit](updateUsername.credentials, updateUsername, _updateUsernameHandler)
+
+  private def _updatePasswordHandler(updatePassword: UpdatePassword): ZIO[AppEnv, Error, Unit] =
     val creds = updatePassword.credentials
     for
-      (passwordHash, maybeUid) <- maybeUidFromCredentials(creds)
+      maybeUid <- maybeUidFromUsername(creds.username)
       uid <- ZIO.succeed(maybeUid).someOrFail(InvalidCredentialsError())
       newPasswordHash <- hashPassword(updatePassword.newPassword)
       _ <- ZIO.serviceWithZIO[UserRepo](_.updatePasswordHash(
         uid, newPasswordHash
       )).mapError(e => AuthError(e.getMessage))
     yield ()
-    
-  def deleteUserHandler(credentials: Credentials): ZIO[AppEnv, Error, Unit] =
+
+  def updatePasswordHandler(updatePassword: UpdatePassword): ZIO[AppEnv, Error, Unit] =
+    executeIfPasswordCorrect[UpdatePassword, Unit](updatePassword.credentials, updatePassword, _updatePasswordHandler)
+
+  private def _deleteUserHandler(credentials: Credentials): ZIO[AppEnv, Error, Unit] =
     for
-      (_, maybeUid) <- maybeUidFromCredentials(credentials)
+      maybeUid <- maybeUidFromUsername(credentials.username)
       uid <- ZIO.succeed(maybeUid).someOrFail(InvalidCredentialsError())
       _ <- ZIO.serviceWithZIO[UserRepo](_.removeById(uid))
         .mapError(e => AuthError(e.getMessage))
     yield ()
+
+  def deleteUserHandler(credentials: Credentials): ZIO[AppEnv, Error, Unit] =
+    executeIfPasswordCorrect[Credentials, Unit](credentials, credentials, _deleteUserHandler)
