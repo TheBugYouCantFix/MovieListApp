@@ -1,10 +1,11 @@
 package app.backend.auth.jwt
 
+import app.backend.auth.requestmodels.UpdateUsername
 import pdi.jwt.{JwtAlgorithm, JwtClaim}
 
 import javax.crypto.spec.SecretKeySpec
 import java.time.Instant
-import app.domain.UserId
+import app.domain.Username
 import pdi.jwt.JwtAlgorithm.HS512
 import zio.{RLayer, ULayer, ZLayer}
 
@@ -13,8 +14,8 @@ case class JwtConfig(
                       algorithm: JwtAlgorithm,
                       durationInSecs: Int
                     ):
-    def claim(userId: UserId): JwtClaim = JwtClaim(
-      subject = Some(userId.toString),
+    def claim(username: Username): JwtClaim = JwtClaim(
+      subject = Some(username.toString),
       expiration = Some(Instant.now.plusSeconds(durationInSecs).getEpochSecond),
       issuedAt = Some(Instant.now.getEpochSecond)
     )

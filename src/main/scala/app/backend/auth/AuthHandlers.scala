@@ -16,9 +16,9 @@ object AuthHandlers:
       .fromTry(password.bcrypt())
       .mapError(e => PasswordHashingFailedError(e.getMessage))
 
-  private def generateToken(userId: UserId): ZIO[JwtService, AuthError, String] =
+  private def generateToken(username: Username): ZIO[JwtService, AuthError, String] =
     ZIO.serviceWithZIO[JwtService](
-      _.jwtEncode(userId)
+      _.jwtEncode(username)
     ).mapError(e => AuthError(e.getMessage))
 
   private def maybeUidFromCredentials(credentials: Credentials): ZIO[AppEnv, Error, (String, Option[UserId])] =
@@ -49,7 +49,7 @@ object AuthHandlers:
         User(credentials.username, passwordHash)
       )).mapError(e => AuthError(e.getMessage))
 
-      token <- generateToken(uid)
+      token <- generateToken(credentials.username)
     yield token
 
   def updateUsernameHandler(updateUsername: UpdateUsername): ZIO[AppEnv, Error, Unit] = 

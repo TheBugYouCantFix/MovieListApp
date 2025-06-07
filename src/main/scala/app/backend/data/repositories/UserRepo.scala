@@ -13,7 +13,8 @@ trait UserRepo:
   def updateUsername(id: UserId, username: Username): Task[Unit]
   def updatePasswordHash(id: UserId, passwordHash: String): Task[Unit]
   def removeById(id: UserId): Task[Unit]
-  def getUidByCredentials(username: Username, passwordHash: String): Task[Option[UserId]]
+  def getUidByUsername(username: Username): Task[Option[UserId]]
+  def getPasswordHashByUsername(username: Username): Task[Option[String]]
 
 final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, Users, UserId] with UserRepo:
   override def add(user: domain.User): Task[UserId] =
@@ -52,18 +53,29 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, Users, U
       deleteById(id)
     }
 
-  override def getUidByCredentials(username: Username, passwordHash: String): Task[Option[UserId]] =
+  override def getUidByUsername(username: Username): Task[Option[UserId]] =
      xa.transact {
       val frag =
         sql"""
           SELECT ${tables.Users.table.uid} FROM "${tables.Users.table}"
-          WHERE username = $username AND password_hash = $passwordHash
+          WHERE username = $username 
           LIMIT 1
           """
 
       frag.query[UserId].run().headOption
     }
 
+  override def getPasswordHashByUsername(username: Username): Task[Option[String]] =
+    xa.transact {
+      val frag =
+        sql"""
+          SELECT ${tables.Users.table.passwordHash} FROM "${tables.Users.table}"
+          WHERE username = $username 
+          LIMIT 1
+          """
+
+      frag.query[String].run().headOption
+    }
 
 
 object UserRepo:
