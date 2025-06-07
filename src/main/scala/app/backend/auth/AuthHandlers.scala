@@ -22,6 +22,18 @@ object AuthHandlers:
     ).mapError(e => AuthError(e.getMessage))
 
   private def maybeUidFromCredentials(credentials: Credentials): ZIO[AppEnv, Error, (String, Option[UserId])] =
+  private def isPasswordCorrect(credentials: Credentials): ZIO[UserRepo, Error, Boolean] =
+    for
+      maybePassword <- ZIO.serviceWithZIO[UserRepo]
+        (_.getPasswordHashByUsername(credentials.username))
+        .mapError(e => AuthError(e.getMessage))
+
+      res <- maybePassword match
+        case Some(passwordHash: String) => ZIO.fromTry(
+          credentials.password.isBcrypted(passwordHash)
+        ).mapError(e => AuthError(e.getMessage))
+        case None => ZIO.succeed(false)
+    yield res
     for
       passwordHash <- hashPassword(credentials.password)
 
