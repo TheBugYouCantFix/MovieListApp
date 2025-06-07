@@ -15,7 +15,7 @@ case class JwtConfig(
                       durationInSecs: Int
                     ):
     def claim(username: Username): JwtClaim = JwtClaim(
-      subject = Some(username.toString),
+      subject = Some(username),
       expiration = Some(Instant.now.plusSeconds(durationInSecs).getEpochSecond),
       issuedAt = Some(Instant.now.getEpochSecond)
     )
