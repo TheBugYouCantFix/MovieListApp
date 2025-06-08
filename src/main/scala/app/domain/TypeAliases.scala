@@ -12,6 +12,7 @@ object MovieId extends RefinedType[BaseIdType, MovieIdDescription]
 type UserIdDescription = DescribedAs[Greater[0], "Id must be greater than 0"]
 type UserId = BaseIdType :| UserIdDescription
 object UserId extends RefinedType[BaseIdType, UserIdDescription]
+given RuntimeConstraint[BaseIdType, UserIdDescription] = RuntimeConstraint.derived
 
 type PasswordDescription = DescribedAs[MinLength[5], "Min password length is 5"]
 type Password = String :| PasswordDescription
