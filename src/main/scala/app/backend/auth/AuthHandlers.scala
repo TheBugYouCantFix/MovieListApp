@@ -63,30 +63,18 @@ object AuthHandlers:
     yield token
 
   def updateUsernameHandler(updateUsername: UpdateUsername): ZIO[AppEnv, Error, Unit] =
-    val creds = updateUsername.credentials
-    for
-      maybeUid <- maybeUidFromUsername(creds.username)
-      uid <- ZIO.succeed(maybeUid).someOrFail(InvalidCredentialsError())
-      _ <- ZIO.serviceWithZIO[UserRepo](_.updateUsername(
-        uid, updateUsername.newUsername
-      )).mapError(e => AuthError(e.getMessage))
-    yield ()
+    ZIO.serviceWithZIO[UserRepo](_.updateUsername(
+      updateUsername.userId, updateUsername.newUsername
+    )).mapError(e => AuthError(e.getMessage))
 
   def updatePasswordHandler(updatePassword: UpdatePassword): ZIO[AppEnv, Error, Unit] =
-    val creds = updatePassword.credentials
     for
-      maybeUid <- maybeUidFromUsername(creds.username)
-      uid <- ZIO.succeed(maybeUid).someOrFail(InvalidCredentialsError())
       newPasswordHash <- hashPassword(updatePassword.newPassword)
       _ <- ZIO.serviceWithZIO[UserRepo](_.updatePasswordHash(
-        uid, newPasswordHash
+        updatePassword.userId, newPasswordHash
       )).mapError(e => AuthError(e.getMessage))
     yield ()
 
-  def deleteUserHandler(credentials: Credentials): ZIO[AppEnv, Error, Unit] =
-    for
-      maybeUid <- maybeUidFromUsername(credentials.username)
-      uid <- ZIO.succeed(maybeUid).someOrFail(InvalidCredentialsError())
-      _ <- ZIO.serviceWithZIO[UserRepo](_.removeById(uid))
-        .mapError(e => AuthError(e.getMessage))
-    yield ()
+  def deleteUserHandler(userId: UserId): ZIO[AppEnv, Error, Unit] =
+    ZIO.serviceWithZIO[UserRepo](_.removeById(userId))
+      .mapError(e => AuthError(e.getMessage))

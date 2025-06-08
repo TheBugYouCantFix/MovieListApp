@@ -2,11 +2,11 @@ package app.backend.auth.requestmodels
 
 import io.circe.*
 
-import app.domain.{Credentials, Username}
+import app.domain.{UserId, Username}
 import app.utils.given 
 
 case class UpdateUsername(
-                          credentials: Credentials,
+                         userId: UserId,
                           newUsername: Username
                          ) derives Codec.AsObject
 

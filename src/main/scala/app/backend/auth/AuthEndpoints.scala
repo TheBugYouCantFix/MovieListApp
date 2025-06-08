@@ -5,7 +5,7 @@ import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 import app.backend.auth.requestmodels.{UpdatePassword, UpdateUsername}
 import app.backend.data.repositories.UserRepo
-import app.domain.{Credentials, Error}
+import app.domain.{Credentials, UserId, Error}
 import app.utils.given
 
 object AuthEndpoints:
@@ -42,7 +42,7 @@ object AuthEndpoints:
   val deleteAccount = endpoint
     .delete
     .in("deleteAccount")
-    .in(jsonBody[Credentials])
+    .in(jsonBody[UserId])
     .errorOut(jsonBody[Error])
     .zServerLogic(AuthHandlers.deleteUserHandler)
 
