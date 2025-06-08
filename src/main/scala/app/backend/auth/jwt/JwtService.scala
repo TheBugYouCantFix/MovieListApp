@@ -8,23 +8,24 @@ import zio.http.*
 
 import scala.util.Try
 
-import app.domain.Username
+import app.domain.UserId
 
 trait JwtService:
-  def jwtEncode(username: Username): Task[String]
+  def jwtEncode(userId: UserId): Task[String]
   def jwtDecodeSync(token: String): Try[JwtClaim]
   def jwtDecode(token: String): Task[JwtClaim]
   val bearerAuthWithContext: HandlerAspect[Any, String]
   
 case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
-  def jwtEncode(username: Username): Task[String] = ZIO.succeed(
-    JwtCirce.encode(jwtConfig.claim(username))
+  def jwtEncode(userId: UserId): Task[String] = ZIO.succeed(
+    JwtCirce.encode(jwtConfig.claim(userId), jwtConfig.secretKey, jwtConfig.algorithm.asInstanceOf[JwtHmacAlgorithm])
   )
-  
-  
+
   def jwtDecodeSync(token: String): Try[JwtClaim] =
     JwtCirce.decode(
       token, jwtConfig.secretKey, Seq(jwtConfig.algorithm.asInstanceOf[JwtHmacAlgorithm])
+    ).orElse(
+      JwtCirce.decode(token)
     )
 
   def jwtDecode(token: String): Task[JwtClaim] = ZIO.fromTry(
