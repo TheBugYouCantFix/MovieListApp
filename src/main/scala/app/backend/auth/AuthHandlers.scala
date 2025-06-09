@@ -10,15 +10,14 @@ import app.backend.AppEnv
 
 
 object AuthHandlers:
-  private type AuthEnv = UserRepo & JwtService
   private def hashPassword(password: Password): ZIO[Any, PasswordHashingFailedError, String] =
     ZIO
       .fromTry(password.bcrypt())
       .mapError(e => PasswordHashingFailedError(e.getMessage))
 
-  private def generateToken(username: Username): ZIO[JwtService, AuthError, String] =
+  private def generateToken(userId: UserId): ZIO[JwtService, AuthError, String] =
     ZIO.serviceWithZIO[JwtService](
-      _.jwtEncode(username)
+      _.jwtEncode(userId)
     ).mapError(e => AuthError(e.getMessage))
 
   private def isPasswordCorrect(credentials: Credentials): ZIO[UserRepo, Error, Boolean] =
@@ -49,7 +48,13 @@ object AuthHandlers:
     yield maybeUid
 
   def loginHandler(credentials: Credentials): ZIO[AppEnv, Error, String] =
-    executeIfPasswordCorrect[Username, String](credentials, credentials.username, generateToken)
+    for
+      maybeUid <- maybeUidFromUsername(credentials.username)
+      res <- maybeUid match
+        case Some(uid) => executeIfPasswordCorrect[UserId, String](credentials, uid, generateToken)
+        case None => ZIO.fail(AuthError(""))
+    yield res
+
 
   def signupHandler(credentials: Credentials): ZIO[AppEnv, Error, String] =
     for
@@ -59,7 +64,7 @@ object AuthHandlers:
         User(credentials.username, passwordHash)
       )).mapError(e => AuthError(e.getMessage))
 
-      token <- generateToken(credentials.username)
+      token <- generateToken(uid)
     yield token
 
   def updateUsernameHandler(updateUsername: UpdateUsername): ZIO[AppEnv, Error, Unit] =
