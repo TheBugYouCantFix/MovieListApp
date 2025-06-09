@@ -3,12 +3,14 @@ package app.backend.auth.jwt
 import pdi.jwt.algorithms.JwtHmacAlgorithm
 import pdi.jwt.{JwtCirce, JwtClaim}
 
+import io.github.iltotore.iron.assume
+
 import zio.*
 import zio.http.*
 
 import scala.util.Try
 
-import app.domain.UserId
+import app.domain.{UserId, UserIdDescription}
 
 trait JwtService:
   def jwtEncode(userId: UserId): Task[String]
@@ -32,7 +34,7 @@ case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
     jwtDecodeSync(token)
   )
 
-  val bearerAuthWithContext: HandlerAspect[Any, String] =
+  val bearerAuthWithContext: HandlerAspect[Any, UserId] =
     HandlerAspect.interceptIncomingHandler(
       Handler.fromFunctionZIO[Request] {
         req => req.header(Header.Authorization) match
@@ -43,7 +45,7 @@ case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
                 claim => ZIO.fromOption(claim.subject)
                   .orElseFail(Response.badRequest("Missing subject claim!"))
               )
-              .map(u => (req, u))
+              .map(u => (req, u.toLong.assume[UserIdDescription]))
 
           case _ => ZIO.fail(Response.unauthorized.addHeader(
             Header.WWWAuthenticate.Bearer(realm = "Access")
