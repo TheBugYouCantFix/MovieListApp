@@ -2,12 +2,13 @@ package app.backend.auth
 
 import zio.*
 import com.github.roundrop.bcrypt.*
+import io.github.iltotore.iron.assume
+
 import app.backend.data.repositories.UserRepo
 import app.backend.auth.jwt.JwtService
-import app.backend.auth.requestmodels.{UpdatePassword, UpdateUsername}
 import app.domain.*
 import app.backend.AppEnv
-
+import app.utils.given
 
 object AuthHandlers:
   private def hashPassword(password: Password): ZIO[Any, PasswordHashingFailedError, String] =
@@ -67,19 +68,38 @@ object AuthHandlers:
       token <- generateToken(uid)
     yield token
 
-  def updateUsernameHandler(updateUsername: UpdateUsername): ZIO[AppEnv, Error, Unit] =
+  def extractUidFromHeaderAndApply[A](f: UserId => A => ZIO[AppEnv, Error, Unit]): A => ZIO[AppEnv, Error, Unit] =
+    arg =>
+      ZIO.service[String]
+        .flatMap(str => {ZIO.log(s"TOKEN: $str").debug; f(str.toLong.assume[UserIdDescription])(arg)})
+        .mapError {
+          case e: NumberFormatException => AuthError(s"Invalid user ID: ${e.getMessage}")
+          case other => other
+        }
+
+  private def _updateUsernameHandler(userId: UserId, newUsername: Username): ZIO[AppEnv, Error, Unit] =
     ZIO.serviceWithZIO[UserRepo](_.updateUsername(
-      updateUsername.userId, updateUsername.newUsername
+      userId, newUsername
     )).mapError(e => AuthError(e.getMessage))
 
-  def updatePasswordHandler(updatePassword: UpdatePassword): ZIO[AppEnv, Error, Unit] =
+  def updateUsernameHandler(newUsername: Username): ZIO[AppEnv, Error, Unit] =
+    extractUidFromHeaderAndApply[Username](_updateUsernameHandler)(newUsername)
+
+  private def _updatePasswordHandler(userId: UserId)(newPassword: Password): ZIO[AppEnv, Error, Unit] =
     for
-      newPasswordHash <- hashPassword(updatePassword.newPassword)
+      newPasswordHash <- hashPassword(newPassword)
       _ <- ZIO.serviceWithZIO[UserRepo](_.updatePasswordHash(
-        updatePassword.userId, newPasswordHash
+        userId, newPasswordHash
       )).mapError(e => AuthError(e.getMessage))
     yield ()
 
-  def deleteUserHandler(userId: UserId): ZIO[AppEnv, Error, Unit] =
+  def updatePasswordHandler(newPassword: Password): ZIO[AppEnv, Error, Unit] =
+    extractUidFromHeaderAndApply[Password](_updatePasswordHandler)(newPassword)
+
+  private def _deleteUserHandler(userId: UserId): ZIO[AppEnv, Error, Unit] =
     ZIO.serviceWithZIO[UserRepo](_.removeById(userId))
       .mapError(e => AuthError(e.getMessage))
+
+  def deleteUserHandler: Unit => ZIO[AppEnv, Error, Unit] =
+    _ => extractUidFromHeaderAndApply[Unit](uid => _ => _deleteUserHandler(uid))(())
+
