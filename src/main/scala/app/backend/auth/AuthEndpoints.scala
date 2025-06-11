@@ -1,12 +1,14 @@
 package app.backend.auth
 
+import app.backend.AppEnv
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
-import app.backend.auth.requestmodels.{UpdatePassword, UpdateUsername}
+import sttp.tapir.codec.iron.*
 import app.backend.data.repositories.UserRepo
-import app.domain.{Credentials, UserId, Error}
+import app.domain.{Credentials, Error, Password, UserId, Username}
 import app.utils.given
+import zio.RIO
 
 object AuthEndpoints:
   val login = endpoint
@@ -25,27 +27,34 @@ object AuthEndpoints:
     .errorOut(jsonBody[Error])
     .zServerLogic(AuthHandlers.signupHandler)
 
-  val updateUsername = endpoint
+  val securedEndpoint = endpoint
+    .securityIn(auth.bearer[String]())
+
+  val updateUsername = securedEndpoint
     .put
     .in("updateUsername")
-    .in(jsonBody[UpdateUsername])
+    .in(jsonBody[Username])
     .errorOut(jsonBody[Error])
-    .zServerLogic(AuthHandlers.updateUsernameHandler)
+    .zServerSecurityLogic(AuthHandlers.authenticateUser)
+    .serverLogic(AuthHandlers.updateUsernameHandler)
 
-  val updatePassword = endpoint
+  val updatePassword = securedEndpoint
     .put
     .in("updatePassword")
-    .in(jsonBody[UpdatePassword])
+    .in(jsonBody[Password])
     .errorOut(jsonBody[Error])
-    .zServerLogic(AuthHandlers.updatePasswordHandler)
+    .zServerSecurityLogic(AuthHandlers.authenticateUser)
+    .serverLogic(AuthHandlers.updatePasswordHandler)
 
-  val deleteAccount = endpoint
+  val deleteAccount = securedEndpoint
     .delete
     .in("deleteAccount")
-    .in(jsonBody[UserId])
     .errorOut(jsonBody[Error])
-    .zServerLogic(AuthHandlers.deleteUserHandler)
+    .zServerSecurityLogic(AuthHandlers.authenticateUser)
+    .serverLogic(AuthHandlers.deleteUserHandler)
 
   val authorizationEndpoints = List(login, signup)
-  val endpoints = List(updateUsername, updatePassword, deleteAccount)
-  val allEndpoints = authorizationEndpoints ++ endpoints
+  val securedEndpoints = List(updateUsername, updatePassword, deleteAccount)
+
+  // For combining all endpoints, widen to a common type
+  val allEndpoints = (authorizationEndpoints ++ securedEndpoints).map(_.widen[AppEnv])
