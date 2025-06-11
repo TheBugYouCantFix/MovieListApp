@@ -20,22 +20,15 @@ object MovieListApp extends ZIOAppDefault:
         "1.0"
       )
   )
-  val securedEndpoints: ZIO[JwtService, Nothing, Routes[AppEnv, Response]] = ZIO.serviceWithZIO[JwtService] { jwtService =>
-    ZIO.succeed(
+  val endpoints: Routes[AppEnv, Response] =
       ZioHttpInterpreter().toHttp(
-        MovieEndpoints.endpoints ++ AuthEndpoints.endpoints
-      ) @@ jwtService.bearerAuthWithContext
+        MovieEndpoints.endpoints ++ AuthEndpoints.allEndpoints
     )
-  }
-  val authorizationEndpoints: Routes[AppEnv, Response] =
-    ZioHttpInterpreter()
-      .toHttp(AuthEndpoints.authorizationEndpoints)
-  val app = securedEndpoints.map(_ ++ swaggerEndpoints ++ authorizationEndpoints)
+
+  val app = (swaggerEndpoints ++ endpoints) @@ Middleware.debug
 
   override def run =
-    app.flatMap(
-      Server.serve(_)
-      )
+    Server.serve(app)
       .provide(
         ZLayer.succeed(Server.Config.default.port(8080)),
         MovieRepo.layer,

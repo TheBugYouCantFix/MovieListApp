@@ -16,7 +16,6 @@ trait JwtService:
   def jwtEncode(userId: UserId): Task[String]
   def jwtDecodeSync(token: String): Try[JwtClaim]
   def jwtDecode(token: String): Task[JwtClaim]
-  val bearerAuthWithContext: HandlerAspect[Any, String]
   
 case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
   def jwtEncode(userId: UserId): Task[String] = ZIO.succeed(
@@ -34,25 +33,6 @@ case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
     jwtDecodeSync(token)
   )
 
-  val bearerAuthWithContext: HandlerAspect[Any, UserId] =
-    HandlerAspect.interceptIncomingHandler(
-      Handler.fromFunctionZIO[Request] {
-        req => req.header(Header.Authorization) match
-          case Some(Header.Authorization.Bearer(token)) =>
-            jwtDecode(token.value.asString)
-              .orElseFail(Response.badRequest("Invalid or expired token!"))
-              .flatMap(
-                claim => ZIO.fromOption(claim.subject)
-                  .orElseFail(Response.badRequest("Missing subject claim!"))
-              )
-              .map(u => (req, u.toLong.assume[UserIdDescription]))
-
-          case _ => ZIO.fail(Response.unauthorized.addHeader(
-            Header.WWWAuthenticate.Bearer(realm = "Access")
-          ))
-      }
-    )
-    
 object JwtService:
   val layer: RLayer[JwtConfig, JwtServiceLive] =
     ZLayer.fromFunction(JwtServiceLive(_))
