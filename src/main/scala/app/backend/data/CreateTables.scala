@@ -23,6 +23,7 @@ def createTables(xa: Transactor) =
             ${tables.Movies.table.uid} INT NOT NULL,
             ${tables.Movies.table.name} VARCHAR(50) NOT NULL,
             ${tables.Movies.table.rating} INT,
+            ${tables.Movies.table.review} VARCHAR(300),
             PRIMARY KEY(${tables.Movies.table.movieId}),
             FOREIGN KEY (${tables.Movies.table.uid}) REFERENCES "${tables.Users.table}"(${tables.Users.table.uid})
             );
