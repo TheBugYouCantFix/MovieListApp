@@ -34,7 +34,6 @@ lazy val root = (project in file("."))
 
       "com.github.jwt-scala" %% "jwt-circe" % "10.0.4",
 
-      "com.github.roundrop" %% "scala3-bcrypt" % "0.1.0"
       "com.github.roundrop" %% "scala3-bcrypt" % "0.1.0",
 
       "ch.qos.logback" % "logback-classic" % "1.4.14"
