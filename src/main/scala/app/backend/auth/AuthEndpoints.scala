@@ -1,20 +1,21 @@
 package app.backend.auth
 
 import app.backend.AppEnv
+import app.backend.auth.requestmodels.{UpdatePasswordRequest, UpdateUsernameRequest}
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
-import sttp.tapir.codec.iron.*
-import app.backend.data.repositories.UserRepo
-import app.domain.{Credentials, Error, Password, UserId, Username}
+import app.domain.credentials.*
+import app.domain.{Error, Password, UserId, Username}
 import app.utils.given
-import zio.RIO
+import zio.ZIO
+
 
 object AuthEndpoints:
   val login = endpoint
     .post
     .in("login")
-    .in(jsonBody[Credentials])
+    .in(jsonBody[PreAuthCredentials])
     .out(plainBody[String])
     .errorOut(jsonBody[Error])
     .zServerLogic(AuthHandlers.loginHandler)
@@ -22,7 +23,7 @@ object AuthEndpoints:
   val signup = endpoint
     .post
     .in("signup")
-    .in(jsonBody[Credentials])
+    .in(jsonBody[PreAuthCredentials])
     .out(plainBody[String])
     .errorOut(jsonBody[Error])
     .zServerLogic(AuthHandlers.signupHandler)
@@ -31,9 +32,9 @@ object AuthEndpoints:
     .securityIn(auth.bearer[String]())
 
   val updateUsername = securedEndpoint
-    .put
+    .post
     .in("updateUsername")
-    .in(jsonBody[Username])
+    .in(jsonBody[UpdateUsernameRequest])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(AuthHandlers.authenticateUser)
     .serverLogic(AuthHandlers.updateUsernameHandler)
@@ -41,7 +42,7 @@ object AuthEndpoints:
   val updatePassword = securedEndpoint
     .put
     .in("updatePassword")
-    .in(jsonBody[Password])
+    .in(jsonBody[UpdatePasswordRequest])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(AuthHandlers.authenticateUser)
     .serverLogic(AuthHandlers.updatePasswordHandler)
@@ -49,6 +50,7 @@ object AuthEndpoints:
   val deleteAccount = securedEndpoint
     .delete
     .in("deleteAccount")
+    .in(jsonBody[Password])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(AuthHandlers.authenticateUser)
     .serverLogic(AuthHandlers.deleteUserHandler)
@@ -56,5 +58,4 @@ object AuthEndpoints:
   val authorizationEndpoints = List(login, signup)
   val securedEndpoints = List(updateUsername, updatePassword, deleteAccount)
 
-  // For combining all endpoints, widen to a common type
   val allEndpoints = (authorizationEndpoints ++ securedEndpoints).map(_.widen[AppEnv])
