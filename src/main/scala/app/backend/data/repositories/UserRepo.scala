@@ -1,6 +1,6 @@
 package app.backend.data.repositories
 
-import app.domain.{NoUserWithGivenIdError, UserId, Username}
+import app.domain.{NoUserWithGivenIdError, UserId, Username, UserIdentifier}
 import app.{domain, tables}
 import app.tables.Users
 import app.utils.given
@@ -15,6 +15,7 @@ trait UserRepo:
   def removeById(id: UserId): Task[Unit]
   def getUidByUsername(username: Username): Task[Option[UserId]]
   def getPasswordHashByUsername(username: Username): Task[Option[String]]
+  def getPasswordHashById(userId: UserId): Task[Option[String]]
 
 final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, Users, UserId] with UserRepo:
   override def add(user: domain.User): Task[UserId] =
@@ -58,7 +59,7 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, Users, U
       val frag =
         sql"""
           SELECT ${tables.Users.table.uid} FROM "${tables.Users.table}"
-          WHERE username = $username 
+          WHERE username = $username
           LIMIT 1
           """
 
@@ -70,7 +71,19 @@ final case class UserRepoLive(xa: Transactor) extends Repo[domain.User, Users, U
       val frag =
         sql"""
           SELECT ${tables.Users.table.passwordHash} FROM "${tables.Users.table}"
-          WHERE username = $username 
+          WHERE ${tables.Users.table.username} = $username
+          LIMIT 1
+          """
+
+      frag.query[String].run().headOption
+    }
+
+  override def getPasswordHashById(userId: UserId): Task[Option[String]] =
+    xa.transact {
+      val frag =
+        sql"""
+          SELECT ${tables.Users.table.passwordHash} FROM "${tables.Users.table}"
+          WHERE ${tables.Users.table.uid} = $userId
           LIMIT 1
           """
 
