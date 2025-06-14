@@ -1,13 +1,12 @@
 package app.backend.movie
 
+import app.backend.AppEnv
 import app.backend.data.repositories.MovieRepo
-import app.domain.{Error, MovieId, Movie, given }
-import app.utils.given 
-
+import app.domain.{Error, Movie, MovieId, given}
+import app.utils.given
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
-
 import io.github.iltotore.iron.circe.given
 
 object MovieEndpoints:
@@ -43,4 +42,4 @@ object MovieEndpoints:
     .errorOut(jsonBody[Error])
     .zServerLogic(_ => MovieHandlers.getAllMoviesHandler)
 
-  val endpoints = List(add, getById, update, delete, getAll)
+  val endpoints: List[ZServerEndpoint[AppEnv, Any]] = List(add, getById, update, delete, getAll)
