@@ -2,11 +2,12 @@ package app.backend
 
 import zio.*
 import zio.http.*
+import zio.http.Header.{AccessControlAllowOrigin, Origin}
+import zio.http.Middleware.{CorsConfig, cors}
 import sttp.tapir.*
 import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
 import sttp.tapir.server.interceptor.log.{DefaultServerLog, ServerLog}
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
-
 import sttp.tapir.server.interceptor.log.{DefaultServerLog, ServerLog}
 import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
 import movie.MovieEndpoints
@@ -14,6 +15,7 @@ import app.backend.auth.AuthEndpoints
 import app.backend.auth.jwt.{JwtConfig, JwtService}
 import data.dbLayer
 import data.repositories.{MovieRepo, MovieRepoLive, UserRepo}
+import zio.http.Header.AccessControlAllowOrigin.Specific
 
 object MovieListApp extends ZIOAppDefault:
   val swaggerEndpoints = ZioHttpInterpreter().toHttp( SwaggerInterpreter()
@@ -26,10 +28,18 @@ object MovieListApp extends ZIOAppDefault:
 
   val endpoints: Routes[AppEnv, Response] =
       ZioHttpInterpreter().toHttp(
-        MovieEndpoints.endpoints ++ AuthEndpoints.allEndpoints 
+        MovieEndpoints.endpoints ++ AuthEndpoints.allEndpoints
     ) ++ swaggerEndpoints
 
-  val app = endpoints @@ Middleware.debug
+  val corsConfig = CorsConfig(
+    allowedOrigin = {
+      case origin if origin == Origin.parse("http://localhost:8080").toOption.get =>
+        Some(AccessControlAllowOrigin.Specific(origin))
+      case _ => None
+    }
+  )
+
+  val app = endpoints  @@ cors(corsConfig)
 
   override def run =
     Server.serve(app)
