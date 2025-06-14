@@ -24,3 +24,5 @@ type UsernameDescription = DescribedAs[
 ]
 type Username = String :| UsernameDescription
 object Username extends RefinedType[String, UsernameDescription]
+
+type UserIdentifier = Username | UserId
