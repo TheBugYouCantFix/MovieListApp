@@ -8,8 +8,6 @@ import sttp.tapir.generic.auto.*
 import app.domain.credentials.*
 import app.domain.{Error, Password, UserId, Username}
 import app.utils.given
-import zio.ZIO
-
 
 object AuthEndpoints:
   val login = endpoint
@@ -32,7 +30,7 @@ object AuthEndpoints:
     .securityIn(auth.bearer[String]())
 
   val updateUsername = securedEndpoint
-    .post
+    .put
     .in("updateUsername")
     .in(jsonBody[UpdateUsernameRequest])
     .errorOut(jsonBody[Error])
