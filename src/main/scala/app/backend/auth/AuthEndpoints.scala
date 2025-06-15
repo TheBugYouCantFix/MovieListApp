@@ -53,7 +53,4 @@ object AuthEndpoints:
     .zServerSecurityLogic(AuthHandlers.authenticateUser)
     .serverLogic(AuthHandlers.deleteUserHandler)
 
-  val authorizationEndpoints = List(login, signup)
-  val securedEndpoints = List(updateUsername, updatePassword, deleteAccount)
-
-  val allEndpoints = (authorizationEndpoints ++ securedEndpoints).map(_.widen[AppEnv])
+  val endpoints = List(login, signup, updateUsername, updatePassword, deleteAccount)
