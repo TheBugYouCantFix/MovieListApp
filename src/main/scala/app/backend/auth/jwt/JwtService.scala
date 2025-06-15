@@ -25,8 +25,6 @@ case class JwtServiceLive(jwtConfig: JwtConfig) extends JwtService:
   def jwtDecodeSync(token: String): Try[JwtClaim] =
     JwtCirce.decode(
       token, jwtConfig.secretKey, Seq(jwtConfig.algorithm.asInstanceOf[JwtHmacAlgorithm])
-    ).orElse(
-      JwtCirce.decode(token)
     )
 
   def jwtDecode(token: String): Task[JwtClaim] = ZIO.fromTry(
