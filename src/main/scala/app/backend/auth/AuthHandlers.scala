@@ -3,13 +3,13 @@ package app.backend.auth
 import zio.*
 import com.github.roundrop.bcrypt.*
 import io.github.iltotore.iron.assume
+
 import app.backend.data.repositories.UserRepo
 import app.backend.auth.jwt.JwtService
 import app.domain.*
 import app.domain.credentials.*
 import app.backend.AppEnv
 import app.backend.auth.requestmodels.*
-import app.utils.given
 
 object AuthHandlers:
   import app.domain.credentials.given

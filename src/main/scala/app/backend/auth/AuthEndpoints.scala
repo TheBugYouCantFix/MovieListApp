@@ -1,12 +1,12 @@
 package app.backend.auth
 
-import app.backend.AppEnv
-import app.backend.auth.requestmodels.{UpdatePasswordRequest, UpdateUsernameRequest}
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
+
+import app.backend.auth.requestmodels.{UpdatePasswordRequest, UpdateUsernameRequest}
 import app.domain.credentials.*
-import app.domain.{Error, Password, UserId, Username}
+import app.domain.{Error, Password, UserId}
 import app.utils.given
 
 object AuthEndpoints:
