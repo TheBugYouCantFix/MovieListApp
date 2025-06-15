@@ -12,19 +12,22 @@ import io.github.iltotore.iron.circe.given
 object MovieEndpoints:
   val add = endpoint
     .post
+    .in("addMovie")
     .in(jsonBody[Movie])
     .errorOut(jsonBody[Error])
     .zServerLogic(MovieHandlers.addMovieHandler)
 
   val getById = endpoint
     .get
-    .in("movie" / path[MovieId])
+    .in("getMovie")
+    .in(path[MovieId])
     .out(jsonBody[Movie])
     .errorOut(jsonBody[Error])
     .zServerLogic(MovieHandlers.getMovieByIdHandler)
 
   val update = endpoint
     .put
+    .in("updateMovie")
     .in(path[MovieId])
     .in(jsonBody[Movie])
     .errorOut(jsonBody[Error])
@@ -38,6 +41,7 @@ object MovieEndpoints:
 
   val getAll = endpoint
     .get
+    .in("getAllMovies")
     .out(jsonBody[Vector[Movie]])
     .errorOut(jsonBody[Error])
     .zServerLogic(_ => MovieHandlers.getAllMoviesHandler)
