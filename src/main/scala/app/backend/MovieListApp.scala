@@ -18,17 +18,19 @@ import data.repositories.{MovieRepo, MovieRepoLive, UserRepo}
 import zio.http.Header.AccessControlAllowOrigin.Specific
 
 object MovieListApp extends ZIOAppDefault:
+  val endpoints = AuthEndpoints.endpoints ++ MovieEndpoints.endpoints
+
   val swaggerEndpoints = ZioHttpInterpreter().toHttp( SwaggerInterpreter()
       .fromServerEndpoints(
-        MovieEndpoints.endpoints ++ AuthEndpoints.allEndpoints,
+        endpoints,
         "MovieListApp",
         "1.0"
       )
   )
 
-  val endpoints: Routes[AppEnv, Response] =
+  val appEndpoints: Routes[AppEnv, Response] =
       ZioHttpInterpreter().toHttp(
-        MovieEndpoints.endpoints ++ AuthEndpoints.allEndpoints
+        endpoints
     ) ++ swaggerEndpoints
 
   val corsConfig = CorsConfig(
@@ -39,7 +41,7 @@ object MovieListApp extends ZIOAppDefault:
     }
   )
 
-  val app = endpoints  @@ cors(corsConfig)
+  val app = appEndpoints @@ cors(corsConfig)
 
   override def run =
     Server.serve(app)
