@@ -72,15 +72,7 @@ object AuthHandlers:
     yield token
 
   def authenticateUser(token: String): ZIO[JwtService, Error, UserId] =
-    for
-      jwtService <- ZIO.service[JwtService].debug
-      claim <- jwtService.jwtDecode(token).mapError(_ => AuthError("Invalid token")).debug
-      subject <- ZIO.fromOption(claim.subject).orElseFail(AuthError("Missing subject")).debug
-      userId <- ZIO.attempt(subject.toLong.assume[UserIdDescription]).debug
-        .mapError(_ => AuthError("Invalid user ID")).debug
-      _ <- ZIO.logInfo(s"auth successful. uid: $userId")
-    yield userId
-
+    ZIO.serviceWithZIO[JwtService](_.authenticateUser(token)).mapError(e => AuthError(e.getMessage))
 
   private def _updateUsernameHandler(uuo: UpdateUsernameOperation): ZIO[AppEnv, Error, Unit] =
     ZIO.serviceWithZIO[UserRepo](_.updateUsername(uuo.userId, uuo.newUsername))
