@@ -3,14 +3,19 @@ package app.backend.movie
 import app.backend.data.repositories.MovieRepo
 import app.domain
 import app.backend.AppEnv
-import app.domain.{MovieId, Movie, MovieError, NoMovieWithGivenIdError}
+import app.backend.auth.jwt.JwtService
+import app.domain.{AuthError, Error, Movie, MovieError, MovieId, NoMovieWithGivenIdError, UserId}
 import zio.*
 
 object MovieHandlers:
-  def addMovieHandler(movie: Movie): ZIO[AppEnv, domain.Error, Unit] =
+  def authenticateUser(token: String): ZIO[JwtService, Error, UserId] =
+    ZIO.serviceWithZIO[JwtService](_.authenticateUser(token)).mapError(e => AuthError(e.getMessage))
+    
+  def addMovieHandler(userId: UserId)(movie: Movie):  ZIO[AppEnv, domain.Error, Unit] =
     ZIO.serviceWithZIO[MovieRepo](_.add(movie)).mapError(e => MovieError(e.getMessage))
   
-  def getMovieByIdHandler(id: MovieId): ZIO[AppEnv, domain.Error, Movie] = 
+
+  def getMovieByIdHandler(userId: UserId)(id: MovieId): ZIO[AppEnv, domain.Error, Movie] = 
     ZIO.serviceWithZIO[MovieRepo](_.getById(id))
       .foldZIO(
         err => ZIO.fail(MovieError("Something went wrong")),
@@ -20,11 +25,11 @@ object MovieHandlers:
         }
       )
   
-  def getAllMoviesHandler: ZIO[AppEnv, domain.Error, Vector[Movie]] =
-    ZIO.serviceWithZIO[MovieRepo](_.getAll).mapError(e => MovieError(e.getMessage))
+  def getAllMoviesHandler(userId: UserId): Unit => ZIO[AppEnv, domain.Error, Vector[Movie]] =
+    _ => ZIO.serviceWithZIO[MovieRepo](_.getAll(userId)).mapError(e => MovieError(e.getMessage))
     
-  def updateMovieHandler(id: MovieId, movie: Movie): ZIO[AppEnv, domain.Error, Unit] =
+  def updateMovieHandler(userId: UserId)(id: MovieId, movie: Movie): ZIO[AppEnv, domain.Error, Unit] =
     ZIO.serviceWithZIO[MovieRepo](_.updateTo(id, movie)).mapError(e => MovieError(e.getMessage))
 
-  def removeMovieByIdHandler(id: MovieId): ZIO[AppEnv, domain.Error, Unit] =
+  def removeMovieByIdHandler(userId: UserId)(id: MovieId): ZIO[AppEnv, domain.Error, Unit] =
     ZIO.serviceWithZIO[MovieRepo](_.removeById(id)).mapError(e => MovieError(e.getMessage))
