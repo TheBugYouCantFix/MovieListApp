@@ -1,7 +1,5 @@
 package app.domain
 
-import io.circe.*
-
 import app.domain.MovieId
 import app.utils.given 
 
@@ -10,5 +8,5 @@ case class Movie(
                   name: String,
                   rating: Int,
                   review: String
-                ) derives Codec.AsObject
+                ) 
 

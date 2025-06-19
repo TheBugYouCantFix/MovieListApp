@@ -1,5 +1,7 @@
 package app.backend.auth
 
+import io.circe.generic.auto.*
+
 import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
