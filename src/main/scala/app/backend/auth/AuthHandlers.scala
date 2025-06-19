@@ -46,7 +46,7 @@ object AuthHandlers:
     yield res
 
 
-  def loginHandler(credentials: PreAuthCredentials): ZIO[AppEnv, Error, String] = {
+  def loginHandler(credentials: PreAuthCredentials): ZIO[AppEnv, Error, String] =
     for
       maybeUid <- ZIO.serviceWithZIO[UserRepo](_.getUidByUsername(
         credentials.username
@@ -56,7 +56,6 @@ object AuthHandlers:
         case Some(uid) => executeIfPasswordCorrect[UserId, String](credentials, uid, generateToken)
         case None => ZIO.fail(AuthError(""))
     yield res
-  }
 
 
   def signupHandler(credentials: PreAuthCredentials): ZIO[AppEnv, Error, String] =
@@ -78,13 +77,12 @@ object AuthHandlers:
     ZIO.serviceWithZIO[UserRepo](_.updateUsername(uuo.userId, uuo.newUsername))
       .mapError(e => AuthError(e.getMessage)).debug
 
-  def updateUsernameHandler(userId: UserId): UpdateUsernameRequest => ZIO[AppEnv, Error, Unit] =
-    updateUsernameReq =>
-      executeIfPasswordCorrect(
-        Credentials(userId, updateUsernameReq.password),
-        UpdateUsernameOperation(userId, updateUsernameReq.newUsername),
-        _updateUsernameHandler
-      )
+  def updateUsernameHandler(userId: UserId)(updateUsernameReq: UpdateUsernameRequest): ZIO[AppEnv, Error, Unit] =
+    executeIfPasswordCorrect(
+      Credentials(userId, updateUsernameReq.password),
+      UpdateUsernameOperation(userId, updateUsernameReq.newUsername),
+      _updateUsernameHandler
+    )
 
   private def _updatePasswordHandler(upo: UpdatePasswordOperation): ZIO[AppEnv, Error, Unit] =
     for
@@ -94,22 +92,20 @@ object AuthHandlers:
       )).mapError(e => AuthError(e.getMessage))
     yield ()
 
-  def updatePasswordHandler(userId: UserId): UpdatePasswordRequest=> ZIO[AppEnv, Error, Unit] =
-    updatePasswordReq =>
-      executeIfPasswordCorrect(
-        Credentials(userId, updatePasswordReq.password),
-        UpdatePasswordOperation(userId, updatePasswordReq.newPassword),
-        _updatePasswordHandler
-      )
+  def updatePasswordHandler(userId: UserId)(updatePasswordReq: UpdatePasswordRequest): ZIO[AppEnv, Error, Unit] =
+    executeIfPasswordCorrect(
+      Credentials(userId, updatePasswordReq.password),
+      UpdatePasswordOperation(userId, updatePasswordReq.newPassword),
+      _updatePasswordHandler
+    )
 
   private def _deleteUserHandler(userId: UserId): ZIO[AppEnv, Error, Unit] =
     ZIO.serviceWithZIO[UserRepo](_.removeById(userId))
       .mapError(e => AuthError(e.getMessage))
 
-  def deleteUserHandler(userId: UserId): Password => ZIO[AppEnv, Error, Unit] =
-    password =>
-      executeIfPasswordCorrect(
-        Credentials(userId, password),
-        userId,
-        _deleteUserHandler
-      )
+  def deleteUserHandler(userId: UserId)(password: Password): ZIO[AppEnv, Error, Unit] =
+    executeIfPasswordCorrect(
+      Credentials(userId, password),
+      userId,
+      _deleteUserHandler
+    )
