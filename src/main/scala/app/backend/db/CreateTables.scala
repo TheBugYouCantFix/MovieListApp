@@ -25,7 +25,8 @@ def createTables(xa: Transactor) =
             ${Movies.table.rating} INT,
             ${Movies.table.review} VARCHAR(300),
             PRIMARY KEY(${Movies.table.movieId}),
-            FOREIGN KEY (${Movies.table.uid}) REFERENCES "${Users.table}"(${Users.table.uid})
+            FOREIGN KEY (${Movies.table.uid}) REFERENCES "${Users.table}"(${Users.table.uid}),
+            CONSTRAINT unique_movie_name_per_user UNIQUE (${Movies.table.uid}, ${Movies.table.name})
             );
         """
 
