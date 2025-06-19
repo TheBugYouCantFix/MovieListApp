@@ -1,6 +1,7 @@
 package app.backend.movie
 
 import app.backend.AppEnv
+import app.backend.auth.AuthHandlers
 import app.backend.data.repositories.MovieRepo
 import app.domain.{Error, Movie, MovieId, given}
 import app.utils.given
@@ -10,40 +11,48 @@ import sttp.tapir.generic.auto.*
 import io.github.iltotore.iron.circe.given
 
 object MovieEndpoints:
-  val add = endpoint
+  val secureEndpoint = endpoint 
+    .securityIn(auth.bearer[String]())
+
+  val add = secureEndpoint 
     .post
     .in("addMovie")
     .in(jsonBody[Movie])
     .errorOut(jsonBody[Error])
-    .zServerLogic(MovieHandlers.addMovieHandler)
+    .zServerSecurityLogic(MovieHandlers.authenticateUser)
+    .serverLogic(MovieHandlers.addMovieHandler)
 
-  val getById = endpoint
+  val getById = secureEndpoint 
     .get
     .in("getMovie")
     .in(path[MovieId])
     .out(jsonBody[Movie])
     .errorOut(jsonBody[Error])
-    .zServerLogic(MovieHandlers.getMovieByIdHandler)
+    .zServerSecurityLogic(MovieHandlers.authenticateUser)
+    .serverLogic(MovieHandlers.getMovieByIdHandler)
 
-  val update = endpoint
+  val update = secureEndpoint
     .put
     .in("updateMovie")
     .in(path[MovieId])
     .in(jsonBody[Movie])
     .errorOut(jsonBody[Error])
-    .zServerLogic(MovieHandlers.updateMovieHandler)
+    .zServerSecurityLogic(MovieHandlers.authenticateUser)
+    .serverLogic(MovieHandlers.updateMovieHandler)
 
-  val delete = endpoint
+  val delete = secureEndpoint
     .delete
     .in("deleteMovie" / path[MovieId])
     .errorOut(jsonBody[Error])
-    .zServerLogic(MovieHandlers.removeMovieByIdHandler)
+    .zServerSecurityLogic(MovieHandlers.authenticateUser)
+    .serverLogic(MovieHandlers.removeMovieByIdHandler)
 
-  val getAll = endpoint
+  val getAll = secureEndpoint
     .get
     .in("getAllMovies")
     .out(jsonBody[Vector[Movie]])
     .errorOut(jsonBody[Error])
-    .zServerLogic(_ => MovieHandlers.getAllMoviesHandler)
+    .zServerSecurityLogic(MovieHandlers.authenticateUser)
+    .serverLogic(MovieHandlers.getAllMoviesHandler)
 
   val endpoints: List[ZServerEndpoint[AppEnv, Any]] = List(add, getById, update, delete, getAll)
