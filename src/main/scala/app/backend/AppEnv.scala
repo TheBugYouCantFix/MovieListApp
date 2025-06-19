@@ -1,6 +1,6 @@
 package app.backend
 
-import data.repositories.*
+import db.repositories.*
 import auth.jwt.JwtService
 
 type AppEnv = MovieRepo & UserRepo & JwtService 

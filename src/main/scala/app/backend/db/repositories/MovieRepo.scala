@@ -1,4 +1,4 @@
-package app.backend.data.repositories
+package app.backend.db.repositories
 
 import zio.*
 import com.augustnagro.magnum.magzio.*

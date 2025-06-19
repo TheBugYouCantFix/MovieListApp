@@ -1,4 +1,4 @@
-package app.backend.data.repositories
+package app.backend.db.repositories
 
 import app.domain.{NoUserWithGivenIdError, UserId, Username, UserIdentifier}
 import app.{domain, tables}

@@ -4,7 +4,7 @@ import zio.*
 import com.github.roundrop.bcrypt.*
 import io.github.iltotore.iron.assume
 
-import app.backend.data.repositories.UserRepo
+import app.backend.db.repositories.UserRepo
 import app.backend.auth.jwt.JwtService
 import app.domain.*
 import app.domain.credentials.*

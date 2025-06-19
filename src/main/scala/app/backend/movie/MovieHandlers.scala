@@ -1,6 +1,6 @@
 package app.backend.movie
 
-import app.backend.data.repositories.MovieRepo
+import app.backend.db.repositories.MovieRepo
 import app.domain
 import app.backend.AppEnv
 import app.backend.auth.jwt.JwtService

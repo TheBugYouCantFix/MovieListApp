@@ -8,7 +8,7 @@ import io.github.iltotore.iron.circe.given
 
 import app.backend.AppEnv
 import app.backend.auth.AuthHandlers
-import app.backend.data.repositories.MovieRepo
+import app.backend.db.repositories.MovieRepo
 import app.domain.{Error, Movie, MovieId, given}
 import app.utils.given
 

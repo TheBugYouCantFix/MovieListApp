@@ -13,8 +13,8 @@ import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
 import movie.MovieEndpoints
 import app.backend.auth.AuthEndpoints
 import app.backend.auth.jwt.{JwtConfig, JwtService}
-import data.dbLayer
-import data.repositories.{MovieRepo, MovieRepoLive, UserRepo}
+import db.dbLayer
+import db.repositories.{MovieRepo, MovieRepoLive, UserRepo}
 import zio.http.Header.AccessControlAllowOrigin.Specific
 
 object MovieListApp extends ZIOAppDefault:
