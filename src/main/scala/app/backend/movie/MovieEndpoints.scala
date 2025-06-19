@@ -1,14 +1,16 @@
 package app.backend.movie
 
+import io.circe.generic.auto.*
+import sttp.tapir.ztapir.*
+import sttp.tapir.json.circe.*
+import sttp.tapir.generic.auto.*
+import io.github.iltotore.iron.circe.given
+
 import app.backend.AppEnv
 import app.backend.auth.AuthHandlers
 import app.backend.data.repositories.MovieRepo
 import app.domain.{Error, Movie, MovieId, given}
 import app.utils.given
-import sttp.tapir.ztapir.*
-import sttp.tapir.json.circe.*
-import sttp.tapir.generic.auto.*
-import io.github.iltotore.iron.circe.given
 
 object MovieEndpoints:
   val secureEndpoint = endpoint 
@@ -17,7 +19,7 @@ object MovieEndpoints:
   val add = secureEndpoint 
     .post
     .in("addMovie")
-    .in(jsonBody[Movie])
+    .in(jsonBody[MovieRequest])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(MovieHandlers.authenticateUser)
     .serverLogic(MovieHandlers.addMovieHandler)
@@ -35,7 +37,7 @@ object MovieEndpoints:
     .put
     .in("updateMovie")
     .in(path[MovieId])
-    .in(jsonBody[Movie])
+    .in(jsonBody[MovieRequest])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(MovieHandlers.authenticateUser)
     .serverLogic(MovieHandlers.updateMovieHandler)
