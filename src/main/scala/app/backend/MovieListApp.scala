@@ -4,18 +4,14 @@ import zio.*
 import zio.http.*
 import zio.http.Header.{AccessControlAllowOrigin, Origin}
 import zio.http.Middleware.{CorsConfig, cors}
-import sttp.tapir.*
-import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
-import sttp.tapir.server.interceptor.log.{DefaultServerLog, ServerLog}
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
-import sttp.tapir.server.interceptor.log.{DefaultServerLog, ServerLog}
-import sttp.tapir.server.ziohttp.{ZioHttpInterpreter, ZioHttpServerOptions}
+import sttp.tapir.server.ziohttp.ZioHttpInterpreter
 import movie.MovieEndpoints
 import app.backend.auth.AuthEndpoints
 import app.backend.auth.jwt.{JwtConfig, JwtService}
+import app.backend.commons.AppEnv
 import db.dbLayer
-import db.repositories.{MovieRepo, MovieRepoLive, UserRepo}
-import zio.http.Header.AccessControlAllowOrigin.Specific
+import db.repositories.{MovieRepo, UserRepo}
 
 object MovieListApp extends ZIOAppDefault:
   val endpoints = AuthEndpoints.endpoints ++ MovieEndpoints.endpoints

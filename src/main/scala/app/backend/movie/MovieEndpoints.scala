@@ -5,9 +5,8 @@ import sttp.tapir.ztapir.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.generic.auto.*
 import io.github.iltotore.iron.circe.given
-
-import app.backend.AppEnv
 import app.backend.auth.AuthHandlers
+import app.backend.commons.AppEnv
 import app.backend.db.repositories.MovieRepo
 import app.domain.{Error, Movie, MovieId, given}
 import app.utils.given

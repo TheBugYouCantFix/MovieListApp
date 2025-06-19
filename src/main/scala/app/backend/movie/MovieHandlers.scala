@@ -2,8 +2,8 @@ package app.backend.movie
 
 import app.backend.db.repositories.MovieRepo
 import app.domain
-import app.backend.AppEnv
 import app.backend.auth.jwt.JwtService
+import app.backend.commons.AppEnv
 import app.domain.{AuthError, Error, Movie, MovieError, MovieId, NoMovieWithGivenIdError, UserId}
 import zio.*
 
