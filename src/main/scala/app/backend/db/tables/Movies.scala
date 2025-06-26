@@ -1,4 +1,4 @@
-package app.tables
+package app.backend.db.tables
 
 import com.augustnagro.magnum.*
 

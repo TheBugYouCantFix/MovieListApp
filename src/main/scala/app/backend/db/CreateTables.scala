@@ -1,8 +1,7 @@
 package app.backend.db
 
+import app.backend.db.tables.{Movies, Users}
 import com.augustnagro.magnum.magzio.*
-
-import app.tables.*
 
 def createTables(xa: Transactor) =
   xa.transact {
