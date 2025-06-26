@@ -12,45 +12,46 @@ import app.domain.{Error, Movie, MovieId, given}
 import app.utils.given
 
 object MovieEndpoints:
-  val secureEndpoint = endpoint 
+  val movieEdndpoint = endpoint
+    .in("my" / "movie")
     .securityIn(auth.bearer[String]())
 
-  val add = secureEndpoint 
+  val add = movieEdndpoint 
     .post
-    .in("addMovie")
+    .in("add")
     .in(jsonBody[MovieRequest])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(MovieHandlers.authenticateUser)
     .serverLogic(MovieHandlers.addMovieHandler)
 
-  val getById = secureEndpoint 
+  val getById = movieEdndpoint 
     .get
-    .in("getMovie")
+    .in("get")
     .in(path[MovieId])
     .out(jsonBody[Movie])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(MovieHandlers.authenticateUser)
     .serverLogic(MovieHandlers.getMovieByIdHandler)
 
-  val update = secureEndpoint
+  val update = movieEdndpoint 
     .put
-    .in("updateMovie")
+    .in("update")
     .in(path[MovieId])
     .in(jsonBody[MovieRequest])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(MovieHandlers.authenticateUser)
     .serverLogic(MovieHandlers.updateMovieHandler)
 
-  val delete = secureEndpoint
+  val delete = movieEdndpoint 
     .delete
-    .in("deleteMovie" / path[MovieId])
+    .in("delete" / path[MovieId])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(MovieHandlers.authenticateUser)
     .serverLogic(MovieHandlers.removeMovieByIdHandler)
 
-  val getAll = secureEndpoint
+  val getAll = movieEdndpoint 
     .get
-    .in("getAllMovies")
+    .in("getAll")
     .out(jsonBody[Vector[Movie]])
     .errorOut(jsonBody[Error])
     .zServerSecurityLogic(MovieHandlers.authenticateUser)
