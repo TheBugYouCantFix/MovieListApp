@@ -5,7 +5,7 @@ import app.backend.db.tables.Movies
 import zio.*
 import com.augustnagro.magnum.magzio.*
 import app.domain.{Movie, MovieId, UserId}
-import app.{domain, tables}
+import app.domain
 import app.utils.given
 
 trait MovieRepo:

@@ -3,7 +3,7 @@ package app.backend.db.repositories
 import app.backend.db.tables
 import app.backend.db.tables.Users
 import app.domain.{NoUserWithGivenIdError, UserId, UserIdentifier, Username}
-import app.{domain, tables}
+import app.domain
 import app.utils.given
 import zio.*
 import com.augustnagro.magnum.magzio.*
